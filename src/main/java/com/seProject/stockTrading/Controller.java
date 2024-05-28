@@ -222,8 +222,22 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("게시글 삭제 중 오류가 발생했습니다.");
         }
     }
-    @GetMapping("/join")
-    public String joinPage(){
-        return "join";
+    // 게시글 edit api
+    @CrossOrigin
+    @PutMapping("/post/{postId}")
+    public ResponseEntity<?> edit(@PathVariable Long postId,@RequestBody Post post) {
+        try {
+            Optional<Post> optionalPost = postRepository.findById(postId);
+            if (optionalPost.isPresent()) {
+                // 기존 엔티티의 ID를 설정하여 객체를 업데이트
+                post.setId(postId);
+                postRepository.save(post);
+                return ResponseEntity.ok().body("게시글이 성공적으로 수정되었습니다.");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시글을 찾을 수 없습니다.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("게시글 수정 중 오류가 발생했습니다.");
+        }
     }
 }

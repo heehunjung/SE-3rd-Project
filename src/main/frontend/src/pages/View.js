@@ -72,7 +72,7 @@ const View = () => {
 
     const handleEdit = () => {
         // 수정 버튼 클릭 시 동작
-        navigate(`/EditPost/${id}`);
+        navigate(`/Post/${memberId}?postId=${id}`);
     };
 
     const handleDelete = () => {
@@ -92,7 +92,7 @@ const View = () => {
                 })
                 .then(() => {
                     alert("게시글이 삭제되었습니다.");
-                    navigate(`/Board/${id}`);
+                    navigate(`/Board/${memberId}`);
                 })
                 .catch(error => setError(error.message));
         }
