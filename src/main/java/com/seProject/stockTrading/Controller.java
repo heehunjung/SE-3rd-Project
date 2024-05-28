@@ -143,9 +143,18 @@ public class Controller {
     }*/
     // 모든 게시물을 list 형태로 가져오는 api
     @CrossOrigin
+    @GetMapping("/board")
+    public ResponseEntity<?> getBoard(){
+        List<Post> postInfo = postRepository.findAllByOrderByCreatedAtDesc();
+        if (postInfo.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시물이 없습니다.");
+        }
+        return ResponseEntity.ok(postInfo);
+    }
+    @CrossOrigin
     @GetMapping("/board/{id}")
     public ResponseEntity<?> getBoard(@PathVariable Long id){
-        List<Post> postInfo = postRepository.findAll();
+        Optional<Post> postInfo = postRepository.findById(id);
         if (postInfo.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시물이 없습니다.");
         }

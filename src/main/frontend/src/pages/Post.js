@@ -44,6 +44,8 @@ const Post = () => {
         e.preventDefault();
         const postData = {
             member: userData,
+            nickname: userData.nickname,
+            createdAt: new Date().toISOString(), // 현재 시간을 created_at 필드에 추가
             ...formData,
         };
         fetch("http://localhost:8080/post",{
@@ -74,7 +76,7 @@ const Post = () => {
         <>
             <Navbar bg="dark" data-bs-theme="dark">
                 <Container>
-                    <Navbar.Brand href={`/Home/${id}`}>KW 거래소</Navbar.Brand>
+                    <Navbar.Brand href={`/Home/${id}`}>KW 거래소📉</Navbar.Brand>
                     <Nav className="ml-auto">
                         <Nav.Link href={`/Home/${id}`}>홈 화면</Nav.Link>
                         <Nav.Link href={`/Trading/${id}`}>주식 구매</Nav.Link>
