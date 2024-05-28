@@ -8,10 +8,10 @@ import com.seProject.stockTrading.domain.memberInfo.MemberInfo;
 import com.seProject.stockTrading.domain.memberInfo.MemberInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate; // RestTemplate import 추가
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
@@ -24,6 +24,7 @@ public class Controller {
     MemberInfoRepository memberInfoRepository;
     MemberRepository memberRepository;
     MemberService memberService;
+
     @Autowired
     public void ImageController(MemberInfoRepository memberInfoRepository,
                                 MemberRepository memberRepository,
@@ -175,4 +176,25 @@ public class Controller {
     public String joinPage(){
         return "join";
     }
+
+    @GetMapping("/stock")
+    public String getStockData() {
+        String url = "https://finance.naver.com/item/sise_day.nhn?code=005930&page=1"; // 예시 URL
+        RestTemplate restTemplate = new RestTemplate();
+        return restTemplate.getForObject(url, String.class);
+    }
+
+    @GetMapping("/stock/kospi")
+    public String getKospiStockData() {
+        String url = "https://finance.naver.com/sise/sise_index_day.nhn?code=KOSPI";
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3");
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+        return response.getBody();
+    }
+
 }

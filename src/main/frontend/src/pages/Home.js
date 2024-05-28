@@ -4,8 +4,9 @@ import Navbar from 'react-bootstrap/Navbar';
 import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import {useParams} from "react-router-dom";
+import { useParams } from "react-router-dom";
 import '../App.css';
+import StockChart from '../components/StockChart';
 
 const Home = () => {
     const { id } = useParams();
@@ -23,7 +24,6 @@ const Home = () => {
             .then(data => setUserData(data))
             .catch(error => setError(error.message));
     }, [id]);
-
 
     return (
         <>
@@ -115,6 +115,11 @@ const Home = () => {
                                 </Card.Text>
                             </Card.Body>
                         </Card>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <StockChart /> {/* StockChart 추가 */}
                     </Col>
                 </Row>
             </Container>
