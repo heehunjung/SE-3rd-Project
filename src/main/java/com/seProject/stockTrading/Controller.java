@@ -240,4 +240,21 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("게시글 수정 중 오류가 발생했습니다.");
         }
     }
+    @CrossOrigin
+    @PutMapping("/viewCount/{postId}")
+    public ResponseEntity<?> incrementViewCount(@PathVariable Long postId) {
+        try {
+            Optional<Post> optionalPost = postRepository.findById(postId);
+            if (optionalPost.isPresent()) {
+                Post post = optionalPost.get();
+                post.setView(post.getView() + 1);
+                postRepository.save(post);
+                return ResponseEntity.ok(post);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시글을 찾을 수 없습니다.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("조회수 증가 중 오류가 발생했습니다.");
+        }
+    }
 }

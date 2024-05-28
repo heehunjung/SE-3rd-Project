@@ -17,6 +17,7 @@ const View = () => {
     const [newComment, setNewComment] = useState("");
     const navigate = useNavigate();
     const [userData, setUserData] = useState(null);
+    const [viewCount, setViewCount] = useState(0);
 
     useEffect(() => {
         fetch(`http://localhost:8080/board/${id}`)
@@ -27,7 +28,20 @@ const View = () => {
                 return res.json();
             })
             .then(data => {
-                setBoardData(data);
+                const updateData = {...data, view: data.view+1};
+                setBoardData(updateData);
+                // 서버에 조회수 업데이트
+                return fetch(`http://localhost:8080/viewCount/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Network response was not ok');
+                }
                 setLoading(false); // 데이터가 성공적으로 로드되면 로딩 상태를 false로 설정
             })
             .catch(error => {
@@ -35,22 +49,6 @@ const View = () => {
                 setLoading(false); // 오류 발생 시 로딩 상태를 false로 설정
             });
     }, [id]);
-
-    /*
-        useEffect(() => {
-            fetch(`http://localhost:8080/board/${id}/comments`)
-                .then(res => {
-                    if (!res.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return res.json();
-                })
-                .then(data => {
-                    setComments(data);
-                })
-                .catch(error => setError(error.message));
-        }, [id]);
-    */
 
     const handleCommentSubmit = (e) => {
         e.preventDefault();
