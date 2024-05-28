@@ -4,8 +4,5 @@ import lombok.Getter;
 
 @Getter
 public class PostDTO {
-    private String content;
-    private String title;
-    private Long member_id;
-    private int board;
+    private Long Id;
 }

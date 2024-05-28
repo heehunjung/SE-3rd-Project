@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from "react-bootstrap/Navbar";
 import { Container, Form, Nav, Button } from "react-bootstrap";
-import { useParams,useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 const Post = () => {
     const { id } = useParams();
@@ -28,7 +28,7 @@ const Post = () => {
         fetch(`http://localhost:8080/memberInfo/${id}`)
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    return response.text().then(text => { throw new Error(text); });
                 }
                 return response.json();
             })
@@ -36,37 +36,43 @@ const Post = () => {
                 setUserData(data);
                 setRole(data.role); // 멤버 객체에서 역할 정보 설정
             })
-            .catch(error => setError(error.message));
+            .catch(error => {
+                setError(error.message);
+                alert(error.message); // 오류 메시지를 알림으로 표시
+            });
     }, [id]);
-
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (!userData) {
+            alert('유저 정보를 가져오는 중입니다. 잠시만 기다려주세요.');
+            return;
+        }
         const postData = {
             member: userData,
             nickname: userData.nickname,
             createdAt: new Date().toISOString(), // 현재 시간을 created_at 필드에 추가
             ...formData,
         };
-        fetch("http://localhost:8080/post",{
+        fetch("http://localhost:8080/post", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json; charset=utf-8',
             },
             body: JSON.stringify(postData),
         })
-            .then((response)=> {
+            .then((response) => {
                 if (response.status === 201) {
                     return response.json();
                 } else {
-                    return Promise.reject('게시글 업로드에 실패하였습니다.')
+                    return response.json().then(err => Promise.reject(err.message || '게시글 업로드에 실패하였습니다.'));
                 }
             })
-            .then((data)=>{
+            .then((data) => {
                 console.log(data);
-                navigate('/board/'+id);
+                navigate('/board/' + id);
             })
-            .catch((error)=>{
+            .catch((error) => {
                 console.error('Error:', error);
                 alert(error);
             });
@@ -92,7 +98,7 @@ const Post = () => {
                     <Form.Control
                         type="text"
                         placeholder="제목을 입력해주세요"
-                        name = "title"
+                        name="title"
                         value={formData.title}
                         onChange={handleChange}
                     />
@@ -102,7 +108,7 @@ const Post = () => {
                     <Form.Control
                         as="textarea"
                         rows={5}
-                        name = "content"
+                        name="content"
                         value={formData.content}
                         onChange={handleChange}
                     />
@@ -111,7 +117,7 @@ const Post = () => {
                     <Form.Label>게시판 선택</Form.Label>
                     <Form.Control
                         as="select"
-                        name = "board"
+                        name="board"
                         value={formData.board}
                         onChange={handleChange}
                     >

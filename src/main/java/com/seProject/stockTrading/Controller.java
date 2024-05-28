@@ -8,6 +8,7 @@ import com.seProject.stockTrading.domain.member.MemberService;
 import com.seProject.stockTrading.domain.post.Post;
 import com.seProject.stockTrading.domain.post.PostDTO;
 import com.seProject.stockTrading.domain.post.PostRepository;
+import com.seProject.stockTrading.domain.post.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,14 +27,17 @@ public class Controller {
     MemberRepository memberRepository;
     MemberService memberService;
     PostRepository postRepository;
+    PostService postService;
     @Autowired
     public Controller(
+            PostService postService,
             PostRepository postRepository,
             MemberRepository memberRepository,
             MemberService memberService){
         this.memberRepository = memberRepository;
         this.memberService = memberService;
         this.postRepository = postRepository;
+        this.postService = postService;
     }
 
  /*   @GetMapping("/upload")
@@ -202,6 +206,21 @@ public class Controller {
     @PostMapping("/post")
     public ResponseEntity<?> post(@RequestBody Post post) {
         return new ResponseEntity<>(postRepository.save(post), HttpStatus.CREATED);
+    }
+    // 게시글 delete api
+    @CrossOrigin
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        try {
+            boolean isDeleted = postService.deletePost(id);
+            if (isDeleted) {
+                return ResponseEntity.ok().body("게시글이 성공적으로 삭제되었습니다.");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시글을 찾을 수 없습니다.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("게시글 삭제 중 오류가 발생했습니다.");
+        }
     }
     @GetMapping("/join")
     public String joinPage(){

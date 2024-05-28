@@ -76,7 +76,7 @@ const Board = () => {
                             <Card.Header>
                                 <Tabs defaultActiveKey="all" transition={false} id="noanim-tab-example" className="mb-3">
                                     <Tab eventKey="all" title="전체 게시판">
-                                        <Card.Body>
+                                        <Card.Body className="scrollable-card">
                                             {boardData.map(post => (
                                                 <p key={post.id}>
                                                     <Badge bg={getBadgeColor(post.board)}>작성자: {post.nickname} </Badge>
@@ -86,13 +86,18 @@ const Board = () => {
                                                         {new Date(post.createdAt).toLocaleString()}
                                                     </span>
                                                     <br/>
-                                                    <Link className="custom-link" to={`/ViewPost/${post.id}`}>{post.title}</Link>
+                                                    <Link
+                                                        className="custom-link"
+                                                        to={`/ViewPost/${post.id}?memberId=${id}`}
+                                                    >
+                                                        {post.title}
+                                                    </Link>
                                                 </p>
                                             ))}
                                         </Card.Body>
                                     </Tab>
                                     <Tab eventKey="info" title="공지사항">
-                                        <Card.Body>
+                                        <Card.Body className="scrollable-card">
                                             {filterPosts(1).map(post => (
                                                 <p key={post.id}>
                                                     <Badge bg="warning">작성자: {post.nickname} </Badge>
@@ -102,13 +107,18 @@ const Board = () => {
                                                         {new Date(post.createdAt).toLocaleString()}
                                                     </span>
                                                     <br/>
-                                                    <Link className="custom-link" to={`/ViewPost/${post.id}`}>{post.title}</Link>
+                                                    <Link
+                                                        className="custom-link"
+                                                        to={`/ViewPost/${post.id}?memberId=${id}`}
+                                                    >
+                                                        {post.title}
+                                                    </Link>
                                                 </p>
                                             ))}
                                         </Card.Body>
                                     </Tab>
                                     <Tab eventKey="discussion" title="종목 토론 방">
-                                        <Card.Body>
+                                        <Card.Body className="scrollable-card">
                                             {filterPosts(2).map(post => (
                                                 <p key={post.id}>
                                                     <Badge bg="success">작성자: {post.nickname} </Badge>
@@ -118,13 +128,18 @@ const Board = () => {
                                                         {new Date(post.createdAt).toLocaleString()}
                                                     </span>
                                                     <br/>
-                                                    <Link className="custom-link" to={`/ViewPost/${post.id}`}>{post.title}</Link>
+                                                    <Link
+                                                        className="custom-link"
+                                                        to={`/ViewPost/${post.id}?memberId=${id}`}
+                                                    >
+                                                        {post.title}
+                                                    </Link>
                                                 </p>
                                             ))}
                                         </Card.Body>
                                     </Tab>
                                     <Tab eventKey="free" title="자유 게시판">
-                                        <Card.Body>
+                                        <Card.Body className="scrollable-card">
                                             {filterPosts(3).map(post => (
                                                 <p key={post.id}>
                                                     <Badge bg="info">작성자: {post.nickname} </Badge>
@@ -134,7 +149,12 @@ const Board = () => {
                                                         {new Date(post.createdAt).toLocaleString()}
                                                     </span>
                                                     <br/>
-                                                    <Link className="custom-link" to={`/ViewPost/${post.id}`}>{post.title}</Link>
+                                                    <Link
+                                                        className="custom-link"
+                                                        to={`/ViewPost/${post.id}?memberId=${id}`}
+                                                    >
+                                                        {post.title}
+                                                    </Link>
                                                 </p>
                                             ))}
                                         </Card.Body>

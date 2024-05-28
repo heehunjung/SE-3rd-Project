@@ -31,5 +31,4 @@ public class Post {
     @ManyToOne
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
-    // fk는 target의 pk로 자동으로 연결되나 ?
 }
