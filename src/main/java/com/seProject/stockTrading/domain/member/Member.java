@@ -1,5 +1,6 @@
 package com.seProject.stockTrading.domain.member;
 
+import com.seProject.stockTrading.domain.enums.MemberRole;
 import com.seProject.stockTrading.domain.post.Post;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -25,7 +26,8 @@ public class Member {
     //사용자 잔고
     @Column(nullable = false)
     private int balance = 0;
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Post> posts;
+    //사용자 권한
+    @Enumerated(EnumType.STRING)
+    private MemberRole role;
 
 }

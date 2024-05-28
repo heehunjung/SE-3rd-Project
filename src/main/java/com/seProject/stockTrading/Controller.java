@@ -5,6 +5,9 @@ import com.seProject.stockTrading.domain.member.MemberDTO;
 import com.seProject.stockTrading.domain.member.MemberRepository;
 import com.seProject.stockTrading.domain.member.MemberService;
 
+import com.seProject.stockTrading.domain.post.Post;
+import com.seProject.stockTrading.domain.post.PostDTO;
+import com.seProject.stockTrading.domain.post.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,12 +25,15 @@ import java.util.Optional;
 public class Controller {
     MemberRepository memberRepository;
     MemberService memberService;
+    PostRepository postRepository;
     @Autowired
-    public void ImageController(
-                                MemberRepository memberRepository,
-                                MemberService memberService){
+    public Controller(
+            PostRepository postRepository,
+            MemberRepository memberRepository,
+            MemberService memberService){
         this.memberRepository = memberRepository;
         this.memberService = memberService;
+        this.postRepository = postRepository;
     }
 
  /*   @GetMapping("/upload")
@@ -135,6 +141,17 @@ public class Controller {
         model.addAttribute("images", images);
         return "index";
     }*/
+    // 모든 게시물을 list 형태로 가져오는 api
+    @CrossOrigin
+    @GetMapping("/board/{id}")
+    public ResponseEntity<?> getBoard(@PathVariable Long id){
+        List<Post> postInfo = postRepository.findAll();
+        if (postInfo.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시물이 없습니다.");
+        }
+        return ResponseEntity.ok(postInfo);
+    }
+    // 멤버 id로 해당 멤버 객체 가져오는 api
     @CrossOrigin
     @GetMapping("/memberInfo/{id}")
     public ResponseEntity<?> getMemberInfo(@PathVariable Long id) {
@@ -145,6 +162,7 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 멤버의 데이터가 존재하지 않아요.");
         }
     }
+    // login api
     @CrossOrigin
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody MemberDTO imageDTO) {
@@ -158,6 +176,7 @@ public class Controller {
             return ResponseEntity.ok(Collections.singletonMap("id", member.getId()));
         }
     }
+    // join api
     @CrossOrigin
     @PostMapping("/join")
     public ResponseEntity<?> join(@RequestBody Member member) {
@@ -168,6 +187,12 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 가입한 사용자 입니다.");
         }
         return new ResponseEntity<>(memberRepository.save(member), HttpStatus.CREATED);
+    }
+    // 게시글 upload api
+    @CrossOrigin
+    @PostMapping("/post")
+    public ResponseEntity<?> post(@RequestBody Post post) {
+        return new ResponseEntity<>(postRepository.save(post), HttpStatus.CREATED);
     }
     @GetMapping("/join")
     public String joinPage(){

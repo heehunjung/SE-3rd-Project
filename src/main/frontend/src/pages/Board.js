@@ -1,23 +1,40 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from "react-bootstrap/Navbar";
-import {Button, Container, Nav, Tab, Tabs} from "react-bootstrap";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Card from "react-bootstrap/Card";
-import {Link} from "react-router-dom";
+import { Container, Nav, Tab, Tabs, Row, Col, Card } from "react-bootstrap";
+import { Link, useParams } from "react-router-dom";
 
 const Board = () => {
+    const { id } = useParams();
+    const [error, setError] = useState(null);
+    const [boardData, setBoardData] = useState([]);
+
+    useEffect(() => {
+        fetch(`http://localhost:8080/board/${id}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => setBoardData(data))
+            .catch(error => setError(error.message));
+    }, [id]);
+
+    const filterPosts = (boardType) => {
+        return boardData.filter(post => post.board === boardType);
+    };
+
     return (
         <>
             <Navbar bg="dark" variant="dark">
                 <Container>
-                    <Navbar.Brand href="/Home">KW 거래소</Navbar.Brand>
+                    <Navbar.Brand href={`/Home/${id}`}>KW 거래소</Navbar.Brand>
                     <Nav className="ml-auto">
-                        <Nav.Link href="/Home">홈 화면</Nav.Link>
-                        <Nav.Link href="/Trading">주식 구매</Nav.Link>
-                        <Nav.Link href="/Board">커뮤니티</Nav.Link>
-                        <Nav.Link href="/MyInfo">내 정보</Nav.Link>
-                        <Nav.Link href="/Post">게시글 작성</Nav.Link>
+                        <Nav.Link href={`/Home/${id}`}>홈 화면</Nav.Link>
+                        <Nav.Link href={`/Trading/${id}`}>주식 구매</Nav.Link>
+                        <Nav.Link href={`/Board/${id}`}>커뮤니티</Nav.Link>
+                        <Nav.Link href={`/MyInfo/${id}`}>내 정보</Nav.Link>
+                        <Nav.Link href={`/Post/${id}`}>게시글 작성</Nav.Link>
                     </Nav>
                 </Container>
             </Navbar>
@@ -30,30 +47,38 @@ const Board = () => {
                                 <Tabs defaultActiveKey="all" transition={false} id="noanim-tab-example" className="mb-3">
                                     <Tab eventKey="all" title="전체 게시판">
                                         <Card.Body>
-                                            <blockquote className="blockquote mb-0">
-                                                <p>전체 게시판</p>
-                                            </blockquote>
+                                            {filterPosts(0).map(post => (
+                                                <p key={post.id}>
+                                                    <Link to={`/post/${post.id}`}>{post.title}</Link>
+                                                </p>
+                                            ))}
                                         </Card.Body>
                                     </Tab>
                                     <Tab eventKey="info" title="공지사항">
                                         <Card.Body>
-                                            <blockquote className="blockquote mb-0">
-                                                <p>공지 사항</p>
-                                            </blockquote>
+                                            {filterPosts(1).map(post => (
+                                                <p key={post.id}>
+                                                    <Link to={`/post/${post.id}`}>{post.title}</Link>
+                                                </p>
+                                            ))}
                                         </Card.Body>
                                     </Tab>
                                     <Tab eventKey="discussion" title="종목 토론 방">
                                         <Card.Body>
-                                            <blockquote className="blockquote mb-0">
-                                                <p>종목 토론 방</p>
-                                            </blockquote>
+                                            {filterPosts(2).map(post => (
+                                                <p key={post.id}>
+                                                    <Link to={`/post/${post.id}`}>{post.title}</Link>
+                                                </p>
+                                            ))}
                                         </Card.Body>
                                     </Tab>
                                     <Tab eventKey="free" title="자유 게시판">
                                         <Card.Body>
-                                            <blockquote className="blockquote mb-0">
-                                                <p>자유 게시판</p>
-                                            </blockquote>
+                                            {filterPosts(3).map(post => (
+                                                <p key={post.id}>
+                                                    <Link to={`/post/${post.id}`}>{post.title}</Link>
+                                                </p>
+                                            ))}
                                         </Card.Body>
                                     </Tab>
                                 </Tabs>
@@ -68,7 +93,6 @@ const Board = () => {
                                     <p>
                                         인기 게시물이 들어갈 자리
                                     </p>
-
                                 </blockquote>
                             </Card.Body>
                         </Card>

@@ -15,11 +15,12 @@ public class Post {
     private String title;
     //게시글 내용
     private String content;
-    //조회수
-    private int view;
+    //조회수 처음 생성시 0으로 초기화
+    @Column(nullable = false)
+    private int view=0;
     //게시판 종류 0: 전체, 1: 공지, 2: 종토방, 3: 자유 게시판
     private int board;
-    //게시글 작성자 ㅡㅁ
+    //게시글 작성자
     @ManyToOne
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
