@@ -1,11 +1,35 @@
-3rd Project prototype 만들기..
-
+README.md
+# 3rd Project Prototype 만들기
+## 1. Node.js 설치
+Node.js 공식 사이트에서 최신 LTS 버전(현재 Node.js 18.x)을 다운로드하여 설치합니다.
+### Node.js 및 npm 버전 확인
+설치가 완료되면 명령 프롬프트를 열고 다음 명령어를 입력하여 버전을 확인합니다.
+```sh
+node -v
+npm -v
+```
+Node.js와 npm 버전이 출력되면 설치가 정상적으로 완료된 것입니다.
+## 2. 프로젝트 실행
+### 프론트엔드 실행
+1. 프로젝트 디렉토리로 이동:
+```sh
 cd src/main/frontend
-
+```
+2. 필요한 패키지 설치:
+```sh
+npm install
+```
+3. 개발 서버 시작:
+```sh
 npm start
+```
+프론트엔드 개발 서버가 시작되며, 브라우저에서 http://localhost:3000으로 접속하여 애플리케이션을 확인할 수 있습니다.
+### 백엔드 실행 (Spring Boot)
+1. MySQL 설정:
+MySQL 서버를 실행하고 picture_board 데이터베이스를 생성합니다:
+```sql
+CREATE DATABASE picture_board;
+```
 
-&
-
-spring boot start 
-
-localhost:3000
+2. Spring Boot 애플리케이션 실행:
+인텔리제이에서 프로젝트를 열고 StockTradingApplication 클래스를 실행합니다. 백엔드 서버가 시작되면 브라우저에서 http://localhost:8080으로 접속하여 백엔드 서비스를 확인할 수 있습니다.
