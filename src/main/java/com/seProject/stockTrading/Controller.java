@@ -4,8 +4,7 @@ import com.seProject.stockTrading.domain.member.Member;
 import com.seProject.stockTrading.domain.member.MemberDTO;
 import com.seProject.stockTrading.domain.member.MemberRepository;
 import com.seProject.stockTrading.domain.member.MemberService;
-import com.seProject.stockTrading.domain.memberInfo.MemberInfo;
-import com.seProject.stockTrading.domain.memberInfo.MemberInfoRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,19 +20,17 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RestController
 public class Controller {
-    MemberInfoRepository memberInfoRepository;
     MemberRepository memberRepository;
     MemberService memberService;
     @Autowired
-    public void ImageController(MemberInfoRepository memberInfoRepository,
+    public void ImageController(
                                 MemberRepository memberRepository,
                                 MemberService memberService){
-        this.memberInfoRepository = memberInfoRepository;
         this.memberRepository = memberRepository;
         this.memberService = memberService;
     }
 
-    @GetMapping("/upload")
+ /*   @GetMapping("/upload")
     public String upload(@RequestParam("member_id") Long memberId, Model model) {
         MemberInfo image = new MemberInfo();
         model.addAttribute("image", image);
@@ -47,12 +44,13 @@ public class Controller {
                               @RequestParam("title")String title,
                               @RequestParam("data") MultipartFile file,
                               @RequestParam("content")String content){
-        MemberInfo memberInfo = new MemberInfo();
         System.out.println("upload로 들어감.");
-            memberInfo.setMemberId(memberId);
-
-            memberInfo.setName(file.getOriginalFilename());
-            memberInfoRepository.save(memberInfo);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("Member not found"));
+        MemberInfo memberInfo = new MemberInfo();
+        memberInfo.setMember(member);
+        memberInfo.setName(file.getOriginalFilename());
+        memberInfoRepository.save(memberInfo);
 
         return "redirect:/index?id=" + memberId;
     }
@@ -74,7 +72,7 @@ public class Controller {
         }
         return "redirect:/index";
     }
-/*    @GetMapping("/images/display/{id}") //image 데이터를 변환해주는
+*//*    @GetMapping("/images/display/{id}") //image 데이터를 변환해주는
     @ResponseBody
     public ResponseEntity<byte[]> displayImage(@PathVariable Long id) {
         Optional<MemberInfo> imageOptional = memberInfoRepository.findById(id);
@@ -88,7 +86,7 @@ public class Controller {
         } else {
             return ResponseEntity.notFound().build();
         }
-    }*/
+    }*//*
     @GetMapping("/viewer/{id}")
     public String viewer(@PathVariable Long id,Model model){
         Optional<MemberInfo> imageOptional = memberInfoRepository.findById(id);
@@ -125,22 +123,22 @@ public class Controller {
             System.out.println("delete 실패");
             return "viewer";
         }
-    }
-    @CrossOrigin
+    }*/
+/*    @CrossOrigin
     @GetMapping("")
     public String firstPage(){
         return "/login";
     }
     @RequestMapping("/index")
     public String start(Model model, @RequestParam("id") Long memberId) {
-        List<MemberInfo> images = memberInfoRepository.findByMember_Id(memberId);
+        List<Member> images = memberRepository.findAllById(memberId);
         model.addAttribute("images", images);
         return "index";
-    }
+    }*/
     @CrossOrigin
     @GetMapping("/memberInfo/{id}")
     public ResponseEntity<?> getMemberInfo(@PathVariable Long id) {
-        Optional<MemberInfo> memberInfoOptional = memberInfoRepository.findById(id);
+        Optional<Member> memberInfoOptional = memberRepository.findById(id);
         if (memberInfoOptional.isPresent()) {
             return ResponseEntity.ok(memberInfoOptional.get());
         } else {

@@ -29,11 +29,11 @@ const Home = () => {
         <>
             <Navbar bg="dark" data-bs-theme="dark">
                 <Container>
-                    <Navbar.Brand href="/Home">kw거래소</Navbar.Brand>
+                    <Navbar.Brand href="/Home">KW 거래소</Navbar.Brand>
                     <Nav className="ml-auto">
                         <Nav.Link href="/Home">홈 화면</Nav.Link>
                         <Nav.Link href="/Trading">주식 구매</Nav.Link>
-                        <Nav.Link href="/Community">커뮤니티</Nav.Link>
+                        <Nav.Link href="/Board">커뮤니티</Nav.Link>
                         <Nav.Link href="/MyInfo">내 정보</Nav.Link>
                     </Nav>
                 </Container>
@@ -108,7 +108,7 @@ const Home = () => {
                 <Row>
                     <Col>
                         <Card>
-                            <Card.Header>게시물</Card.Header>
+                            <Card.Header>오늘의 주식</Card.Header>
                             <Card.Body>
                                 <Card.Text>
                                     <p>게시글이 없습니다.</p>
