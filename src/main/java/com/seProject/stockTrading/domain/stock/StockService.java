@@ -47,7 +47,12 @@ public class StockService {
             Stock stock = stockOptional.orElseGet(() -> {
                 Stock newStock = new Stock();
                 newStock.setStockSymbol(stockCode);
-                newStock.setStockName("Stock Name"); // 필요한 경우 주식 이름 설정
+                try {
+                    newStock.setStockName(fetchStockName(stockCode)); // 주식 이름 설정
+                } catch (Exception e) {
+                    newStock.setStockName("Unknown"); // 예외 발생 시 기본값 설정
+                    e.printStackTrace(); // 예외 로그 출력
+                }
                 newStock.setVolume(0); // 기본값 설정
                 return stockRepository.save(newStock);
             });
@@ -95,5 +100,17 @@ public class StockService {
         }
 
         return stockData;
+    }
+
+    private String fetchStockName(String stockCode) throws Exception {
+        try {
+            String url = "https://finance.naver.com/item/main.naver?code=" + stockCode;
+            Document doc = Jsoup.connect(url).get();
+            Element nameElement = doc.selectFirst("div.wrap_company h2 a");
+            return nameElement != null ? nameElement.text() : "Unknown";
+        } catch (Exception e) {
+            e.printStackTrace(); // 예외 로그 출력
+            throw new Exception("Error fetching stock name for code: " + stockCode, e);
+        }
     }
 }
