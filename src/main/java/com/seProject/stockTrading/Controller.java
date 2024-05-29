@@ -8,6 +8,7 @@ import com.seProject.stockTrading.domain.member.MemberService;
 import com.seProject.stockTrading.domain.post.Post;
 import com.seProject.stockTrading.domain.post.PostDTO;
 import com.seProject.stockTrading.domain.post.PostRepository;
+import com.seProject.stockTrading.domain.post.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,14 +27,17 @@ public class Controller {
     MemberRepository memberRepository;
     MemberService memberService;
     PostRepository postRepository;
+    PostService postService;
     @Autowired
     public Controller(
+            PostService postService,
             PostRepository postRepository,
             MemberRepository memberRepository,
             MemberService memberService){
         this.memberRepository = memberRepository;
         this.memberService = memberService;
         this.postRepository = postRepository;
+        this.postService = postService;
     }
 
  /*   @GetMapping("/upload")
@@ -143,9 +147,18 @@ public class Controller {
     }*/
     // 모든 게시물을 list 형태로 가져오는 api
     @CrossOrigin
+    @GetMapping("/board")
+    public ResponseEntity<?> getBoard(){
+        List<Post> postInfo = postRepository.findAllByOrderByCreatedAtDesc();
+        if (postInfo.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시물이 없습니다.");
+        }
+        return ResponseEntity.ok(postInfo);
+    }
+    @CrossOrigin
     @GetMapping("/board/{id}")
     public ResponseEntity<?> getBoard(@PathVariable Long id){
-        List<Post> postInfo = postRepository.findAll();
+        Optional<Post> postInfo = postRepository.findById(id);
         if (postInfo.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시물이 없습니다.");
         }
@@ -194,8 +207,54 @@ public class Controller {
     public ResponseEntity<?> post(@RequestBody Post post) {
         return new ResponseEntity<>(postRepository.save(post), HttpStatus.CREATED);
     }
-    @GetMapping("/join")
-    public String joinPage(){
-        return "join";
+    // 게시글 delete api
+    @CrossOrigin
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        try {
+            boolean isDeleted = postService.deletePost(id);
+            if (isDeleted) {
+                return ResponseEntity.ok().body("게시글이 성공적으로 삭제되었습니다.");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시글을 찾을 수 없습니다.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("게시글 삭제 중 오류가 발생했습니다.");
+        }
+    }
+    // 게시글 edit api
+    @CrossOrigin
+    @PutMapping("/post/{postId}")
+    public ResponseEntity<?> edit(@PathVariable Long postId,@RequestBody Post post) {
+        try {
+            Optional<Post> optionalPost = postRepository.findById(postId);
+            if (optionalPost.isPresent()) {
+                // 기존 엔티티의 ID를 설정하여 객체를 업데이트
+                post.setId(postId);
+                postRepository.save(post);
+                return ResponseEntity.ok().body("게시글이 성공적으로 수정되었습니다.");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시글을 찾을 수 없습니다.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("게시글 수정 중 오류가 발생했습니다.");
+        }
+    }
+    @CrossOrigin
+    @PutMapping("/viewCount/{postId}")
+    public ResponseEntity<?> incrementViewCount(@PathVariable Long postId) {
+        try {
+            Optional<Post> optionalPost = postRepository.findById(postId);
+            if (optionalPost.isPresent()) {
+                Post post = optionalPost.get();
+                post.setView(post.getView() + 1);
+                postRepository.save(post);
+                return ResponseEntity.ok(post);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시글을 찾을 수 없습니다.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("조회수 증가 중 오류가 발생했습니다.");
+        }
     }
 }

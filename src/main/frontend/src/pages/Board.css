@@ -1,0 +1,27 @@
+.custom-link {
+    color: black; /* 검정색 글씨 */
+    text-decoration: none; /* 밑줄 제거 */
+}
+
+.custom-link:hover {
+    color: black; /* 호버 시에도 검정색 유지 */
+    text-decoration: underline; /* 호버 시 밑줄 추가 (원하면 제거 가능) */
+}
+.centered-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+}
+
+.card-custom {
+    min-width: 500px;
+    min-height: 600px;
+    max-width: 80vw;
+    max-height: 80vh;
+}
+
+.scrollable-card {
+    max-height: 50vh; /* 원하는 최대 높이 설정 */
+    overflow-y: auto; /* 수직 스크롤 활성화 */
+}

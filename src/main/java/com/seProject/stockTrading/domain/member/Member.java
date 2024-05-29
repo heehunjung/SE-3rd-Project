@@ -7,6 +7,8 @@ import lombok.Getter;
 
 import java.util.List;
 
+import static com.seProject.stockTrading.domain.enums.MemberRole.USER;
+
 @Entity
 @Getter
 public class Member {
@@ -28,6 +30,6 @@ public class Member {
     private int balance = 0;
     //사용자 권한
     @Enumerated(EnumType.STRING)
-    private MemberRole role;
+    private MemberRole role = USER;
 
 }
