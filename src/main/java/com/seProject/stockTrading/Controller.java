@@ -1,5 +1,7 @@
 package com.seProject.stockTrading;
 
+import com.seProject.stockTrading.domain.commets.Comment;
+import com.seProject.stockTrading.domain.commets.CommentRepository;
 import com.seProject.stockTrading.domain.member.Member;
 import com.seProject.stockTrading.domain.member.MemberDTO;
 import com.seProject.stockTrading.domain.member.MemberRepository;
@@ -28,16 +30,19 @@ public class Controller {
     MemberService memberService;
     PostRepository postRepository;
     PostService postService;
+    CommentRepository commentRepository;
     @Autowired
     public Controller(
             PostService postService,
             PostRepository postRepository,
             MemberRepository memberRepository,
-            MemberService memberService){
+            MemberService memberService,
+            CommentRepository commentRepository){
         this.memberRepository = memberRepository;
         this.memberService = memberService;
         this.postRepository = postRepository;
         this.postService = postService;
+        this.commentRepository = commentRepository;
     }
 
  /*   @GetMapping("/upload")
@@ -175,6 +180,12 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 멤버의 데이터가 존재하지 않아요.");
         }
     }
+    @CrossOrigin
+    @GetMapping("/getComment/{postId}")
+    public ResponseEntity<?> getCommentsByPostId(@PathVariable Long postId) {
+        List<Comment> comments = commentRepository.findAllByPostId(postId);
+        return ResponseEntity.ok(comments);
+    }
     // login api
     @CrossOrigin
     @PostMapping("/login")
@@ -240,6 +251,13 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("게시글 수정 중 오류가 발생했습니다.");
         }
     }
+    // 댓글 upload api
+    @CrossOrigin
+    @PostMapping("/postComment")
+    public ResponseEntity<?> uploadComment(@RequestBody Comment comment) {
+        return new ResponseEntity<>(commentRepository.save(comment),HttpStatus.CREATED);
+    }
+    //조회수 +1 update api
     @CrossOrigin
     @PutMapping("/viewCount/{postId}")
     public ResponseEntity<?> incrementViewCount(@PathVariable Long postId) {

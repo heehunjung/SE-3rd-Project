@@ -40,6 +40,11 @@ const Board = () => {
     const filterPosts = (boardType) => {
         return boardData.filter(post => post.board === boardType);
     };
+    // 인기 게시물을 출력하는 메소드
+    const topPosts = boardData
+        .sort((a,b) => b.view - a.view)
+        .slice(0,5);
+
 
     const getBadgeColor = (boardType) => {
         switch (boardType) {
@@ -166,19 +171,31 @@ const Board = () => {
                     <Col md={3}>
                         <Card>
                             <Card.Header>🔥인기게시물🔥</Card.Header>
-                            <Card.Body>
-                                <blockquote className="blockquote mb-0">
-                                    <p>
-                                        인기 게시물이 들어갈 자리
+                            <Card.Body className="scrollable-card2">
+                                {topPosts.map(post => (
+                                    <p key={post.id}>
+                                        <Badge bg={getBadgeColor(post.board)}>작성자: {post.nickname} </Badge>
+                                        <Badge bg="secondary">조회수: {post.view}</Badge>
+                                        <span
+                                            style={{fontSize: '0.8em', color: 'gray', marginLeft: '10px'}}>
+                                                        {new Date(post.createdAt).toLocaleString()}
+                                                    </span>
+                                        <br/>
+                                        <Link
+                                            className="custom-link"
+                                            to={`/ViewPost/${post.id}?memberId=${id}`}
+                                        >
+                                            {post.title}
+                                        </Link>
                                     </p>
-                                </blockquote>
+                                ))}
                             </Card.Body>
                         </Card>
                     </Col>
                 </Row>
-                <br />
-                <br />
-                <br />
+                <br/>
+                <br/>
+                <br/>
                 <Row>
                     <Col>
                         <Card>
