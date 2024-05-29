@@ -1,7 +1,7 @@
 package com.seProject.stockTrading.domain.stock;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 public class Stock {
@@ -11,13 +11,13 @@ public class Stock {
     private Long id;
 
     private String stockSymbol;
-    private LocalDate date;
-    private float openPrice;
-    private float closePrice;
-    private float highPrice;
-    private float lowPrice;
+    private String stockName;
     private int volume;
 
+    @OneToMany(mappedBy = "stock", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StockPrice> stockPrices;
+
+    // Getter and Setter methods
     public Long getId() {
         return id;
     }
@@ -34,44 +34,12 @@ public class Stock {
         this.stockSymbol = stockSymbol;
     }
 
-    public LocalDate getDate() {
-        return date;
+    public String getStockName() {
+        return stockName;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public float getOpenPrice() {
-        return openPrice;
-    }
-
-    public void setOpenPrice(float openPrice) {
-        this.openPrice = openPrice;
-    }
-
-    public float getClosePrice() {
-        return closePrice;
-    }
-
-    public void setClosePrice(float closePrice) {
-        this.closePrice = closePrice;
-    }
-
-    public float getHighPrice() {
-        return highPrice;
-    }
-
-    public void setHighPrice(float highPrice) {
-        this.highPrice = highPrice;
-    }
-
-    public float getLowPrice() {
-        return lowPrice;
-    }
-
-    public void setLowPrice(float lowPrice) {
-        this.lowPrice = lowPrice;
+    public void setStockName(String stockName) {
+        this.stockName = stockName;
     }
 
     public int getVolume() {
@@ -82,17 +50,11 @@ public class Stock {
         this.volume = volume;
     }
 
-    @Override
-    public String toString() {
-        return "Stock{" +
-                "id=" + id +
-                ", stockSymbol='" + stockSymbol + '\'' +
-                ", date=" + date +
-                ", openPrice=" + openPrice +
-                ", closePrice=" + closePrice +
-                ", highPrice=" + highPrice +
-                ", lowPrice=" + lowPrice +
-                ", volume=" + volume +
-                '}';
+    public List<StockPrice> getStockPrices() {
+        return stockPrices;
+    }
+
+    public void setStockPrices(List<StockPrice> stockPrices) {
+        this.stockPrices = stockPrices;
     }
 }
