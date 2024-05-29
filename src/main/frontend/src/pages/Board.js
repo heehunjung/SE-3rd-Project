@@ -10,7 +10,6 @@ const Board = () => {
     const [boardData, setBoardData] = useState([]);
     const [userData, setUserData] = useState(null);
 
-    // 유저 정보를 가져오는 메소드
     useEffect(() => {
         fetch(`http://localhost:8080/memberInfo/${id}`)
             .then(response => {
@@ -40,11 +39,14 @@ const Board = () => {
     const filterPosts = (boardType) => {
         return boardData.filter(post => post.board === boardType);
     };
-    // 인기 게시물을 출력하는 메소드
+
+    const sortPostsByDate = (posts) => {
+        return posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    };
+
     const topPosts = boardData
         .sort((a,b) => b.view - a.view)
         .slice(0,5);
-
 
     const getBadgeColor = (boardType) => {
         switch (boardType) {
@@ -82,7 +84,7 @@ const Board = () => {
                                 <Tabs defaultActiveKey="all" transition={false} id="noanim-tab-example" className="mb-3">
                                     <Tab eventKey="all" title="전체 게시판">
                                         <Card.Body className="scrollable-card">
-                                            {boardData.map(post => (
+                                            {sortPostsByDate(boardData).map(post => (
                                                 <p key={post.id}>
                                                     <Badge bg={getBadgeColor(post.board)}>작성자: {post.nickname} </Badge>
                                                     <Badge bg="secondary">조회수: {post.view}</Badge>
@@ -103,7 +105,7 @@ const Board = () => {
                                     </Tab>
                                     <Tab eventKey="info" title="공지사항">
                                         <Card.Body className="scrollable-card">
-                                            {filterPosts(1).map(post => (
+                                            {sortPostsByDate(filterPosts(1)).map(post => (
                                                 <p key={post.id}>
                                                     <Badge bg="warning">작성자: {post.nickname} </Badge>
                                                     <Badge bg="secondary">조회수: {post.view}</Badge>
@@ -124,7 +126,7 @@ const Board = () => {
                                     </Tab>
                                     <Tab eventKey="discussion" title="종목 토론 방">
                                         <Card.Body className="scrollable-card">
-                                            {filterPosts(2).map(post => (
+                                            {sortPostsByDate(filterPosts(2)).map(post => (
                                                 <p key={post.id}>
                                                     <Badge bg="success">작성자: {post.nickname} </Badge>
                                                     <Badge bg="secondary">조회수: {post.view}</Badge>
@@ -145,7 +147,7 @@ const Board = () => {
                                     </Tab>
                                     <Tab eventKey="free" title="자유 게시판">
                                         <Card.Body className="scrollable-card">
-                                            {filterPosts(3).map(post => (
+                                            {sortPostsByDate(filterPosts(3)).map(post => (
                                                 <p key={post.id}>
                                                     <Badge bg="info">작성자: {post.nickname} </Badge>
                                                     <Badge bg="secondary">조회수: {post.view}</Badge>

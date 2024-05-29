@@ -1,12 +1,3 @@
-.custom-link {
-    color: black; /* 검정색 글씨 */
-    text-decoration: none; /* 밑줄 제거 */
-}
-
-.custom-link:hover {
-    color: black; /* 호버 시에도 검정색 유지 */
-    text-decoration: underline; /* 호버 시 밑줄 추가 (원하면 제거 가능) */
-}
 .centered-container {
     display: flex;
     justify-content: center;
@@ -14,21 +5,118 @@
     min-height: 80vh;
 }
 
-.card-custom {
-    min-width: 500px;
-    min-height: 600px;
-    max-width: 80vw;
-    max-height: 80vh;
+body {
+    background-color: #2a2a2a; /* 배경색을 어두운 회색으로 설정 */
+    color: #f8f9fa; /* 텍스트 색상을 밝은 색으로 설정 */
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: #cccccc !important; /* 네비게이션 링크 색상 변경 */
+}
+
+.navbar-dark .navbar-brand {
+    color: #cccccc !important; /* 브랜드 텍스트 색상 변경 */
+}
+
+.navbar-dark {
+    background-color: #2a2a2a !important; /* NavBar 배경색을 어두운 회색으로 설정 */
+}
+
+.nav-tabs {
+    background-color: #3a3a3a !important; /* 탭 배경색을 어두운 회색으로 설정 */
+}
+
+.nav-tabs .nav-link {
+    background-color: #3a3a3a !important; /* 탭 링크 배경색을 어두운 회색으로 설정 */
+    color: #f8f9fa !important; /* 탭 텍스트 색상을 밝은 색으로 설정 */
+    border: 1px solid #555555; /* 테두리 색상 */
+}
+
+.nav-tabs .nav-link.active {
+    background-color: #2a2a2a !important; /* 활성화된 탭 링크 배경색을 어두운 회색으로 설정 */
+    border-bottom-color: transparent;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #ffffff !important; /* 호버된 탭 텍스트 색상을 밝은 색으로 설정 */
 }
 
 .scrollable-card {
-    max-height: 50vh; /* 원하는 최대 높이 설정 */
-    overflow-y: auto; /* 수직 스크롤 활성화 */
-}
-.scrollable-card2 {
-    max-height: 55vh; /* 원하는 최대 높이 설정 */
-    max-width: 50vh;
-    overflow-y: auto; /* 수직 스크롤 활성화 */
-    overflow-x: auto; /* 수직 스크롤 활성화 */
+    height: 500px; /* 필요에 따라 높이 조정 */
+    overflow-y: auto;
+    background-color: #3a3a3a; /* 배경색을 어두운 회색으로 설정 */
+    color: #f8f9fa; /* 텍스트 색상을 밝은 색으로 설정 */
+    padding: 5px;
+    border: 1px solid #555555;
+    border-radius: 4px;
+    scrollbar-color: transparent transparent; /* Firefox */
 }
 
+.scrollable-card2 {
+    height: 500px; /* scrollable-card와 높이 맞추기 */
+    overflow-y: auto;
+    background-color: #3a3a3a; /* 배경색을 어두운 회색으로 설정 */
+    color: #f8f9fa; /* 텍스트 색상을 밝은 색으로 설정 */
+    padding: 10px;
+    border: 1px solid #555555;
+    border-radius: 4px;
+    scrollbar-color: transparent transparent; /* Firefox */
+}
+
+.custom-link {
+    color: #f8f9fa; /* 링크 텍스트 색상을 밝은 색으로 설정 */
+    text-decoration: none; /* 밑줄 제거 */
+}
+
+.custom-link:hover {
+    color: #ffffff; /* 호버 시에도 밝은 색 유지 */
+    text-decoration: underline; /* 호버 시 밑줄 추가 */
+}
+
+.card {
+    background-color: #2a2a2a; /* 카드 배경색을 어두운 회색으로 설정 */
+    color: #f8f9fa; /* 카드 텍스트 색상을 밝은 색으로 설정 */
+    border: 1px solid #555555;
+}
+
+.card-header {
+    background-color: #3a3a3a; /* 카드 헤더 배경색을 어두운 회색으로 설정 */
+    color: #f8f9fa; /* 카드 헤더 텍스트 색상을 밝은 색으로 설정 */
+    border-bottom: 1px solid #555555;
+}
+
+.badge {
+    background-color: #555555; /* 배지 배경색을 어두운 회색으로 설정 */
+    color: #f8f9fa; /* 배지 텍스트 색상을 밝은 색으로 설정 */
+}
+.btn-icon {
+    background: none; /* 배경 제거 */
+    border: none; /* 테두리 제거 */
+    color: #f8f9fa; /* 텍스트 색상 */
+    padding: 0; /* 패딩 제거 */
+    font-size: 1.2rem; /* 아이콘 크기 조정 */
+    cursor: pointer; /* 커서 변경 */
+}
+
+.btn-icon:hover {
+    color: #ffffff; /* 호버 시 색상 변경 */
+}
+
+.alert {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-color: #f5c6cb;
+}
+
+.spinner-border {
+    color: #ffffff;
+}
+.form-control {
+    background-color: #444444; /* 입력 필드 배경색 */
+    color: #f8f9fa; /* 입력 필드 텍스트 색상 */
+    border: 1px solid #555555; /* 테두리 색상 */
+}
+
+.form-control::placeholder {
+    color: #cccccc; /* 플레이스홀더 색상 */
+}
