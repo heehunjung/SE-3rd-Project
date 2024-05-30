@@ -9,15 +9,13 @@ public class Stock {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String stockSymbol;
     private String stockName;
-    private int volume;
 
     @OneToMany(mappedBy = "stock", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StockPrice> stockPrices;
 
-    // Getter and Setter methods
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -40,14 +38,6 @@ public class Stock {
 
     public void setStockName(String stockName) {
         this.stockName = stockName;
-    }
-
-    public int getVolume() {
-        return volume;
-    }
-
-    public void setVolume(int volume) {
-        this.volume = volume;
     }
 
     public List<StockPrice> getStockPrices() {

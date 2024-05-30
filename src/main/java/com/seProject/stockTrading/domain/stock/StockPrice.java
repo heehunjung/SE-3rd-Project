@@ -9,29 +9,16 @@ public class StockPrice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private LocalDate date;
+    private float closingPrice;
+    private float openPrice;
+    private float highPrice;
+    private float lowPrice;
+    private int volume;
 
     @ManyToOne
     @JoinColumn(name = "stock_id")
     private Stock stock;
-
-    private LocalDate date;
-    private float closePrice = 0;  // 기본값 설정
-    private float openPrice = 0;   // 기본값 설정
-    private float highPrice = 0;   // 기본값 설정
-    private float lowPrice = 0;    // 기본값 설정
-    private int volume = 0;        // 기본값 설정
-
-    public StockPrice() {}
-
-    public StockPrice(Stock stock, LocalDate date, float closePrice, float openPrice, float highPrice, float lowPrice, int volume) {
-        this.stock = stock;
-        this.date = date;
-        this.closePrice = closePrice;
-        this.openPrice = openPrice;
-        this.highPrice = highPrice;
-        this.lowPrice = lowPrice;
-        this.volume = volume;
-    }
 
     // Getters and Setters
     public Long getId() {
@@ -42,14 +29,6 @@ public class StockPrice {
         this.id = id;
     }
 
-    public Stock getStock() {
-        return stock;
-    }
-
-    public void setStock(Stock stock) {
-        this.stock = stock;
-    }
-
     public LocalDate getDate() {
         return date;
     }
@@ -58,12 +37,12 @@ public class StockPrice {
         this.date = date;
     }
 
-    public float getClosePrice() {
-        return closePrice;
+    public float getClosingPrice() {
+        return closingPrice;
     }
 
-    public void setClosePrice(float closePrice) {
-        this.closePrice = closePrice;
+    public void setClosingPrice(float closingPrice) {
+        this.closingPrice = closingPrice;
     }
 
     public float getOpenPrice() {
@@ -96,5 +75,13 @@ public class StockPrice {
 
     public void setVolume(int volume) {
         this.volume = volume;
+    }
+
+    public Stock getStock() {
+        return stock;
+    }
+
+    public void setStock(Stock stock) {
+        this.stock = stock;
     }
 }
