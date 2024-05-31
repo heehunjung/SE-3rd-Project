@@ -24,8 +24,8 @@ npm start
 ```
 ### 백엔드 실행 (Spring Boot)
 1. MySQL 설정:
-MySQL 서버를 실행하고 데이터베이스를 생성 후
-application.properties, application.yml를 각자 환경에 맞게 수정
+MySQL 서버를 실행하고 데이터베이스를 생성
+2. application.properties, application.yml를 각자 환경에 맞게 수정
 ```sql
 EX) CREATE DATABASE picture_board;
 ```
