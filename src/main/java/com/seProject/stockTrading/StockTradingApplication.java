@@ -19,6 +19,8 @@ public class StockTradingApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) {
 		try {
+			stockService.fetchTop100Stocks();
+			System.out.println("Top 100 stocks fetched and saved successfully.");
 			stockService.fetchAndSaveAllStocks();
 			System.out.println("Stock data fetched and saved successfully.");
 		} catch (Exception e) {
@@ -26,5 +28,4 @@ public class StockTradingApplication implements CommandLineRunner {
 			System.out.println("An error occurred: " + e.getMessage());
 		}
 	}
-
 }
