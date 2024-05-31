@@ -1,5 +1,5 @@
 README.md
-# (수정)주식 DB 만들기
+#주식 플랫폼
 ## 1. Node.js 설치
 Node.js 공식 사이트에서 최신 LTS 버전(현재 Node.js 18.x)을 다운로드하여 설치합니다.
 ### Node.js 및 npm 버전 확인
@@ -35,41 +35,3 @@ CREATE DATABASE picture_board;
 서버가 시작되며, 브라우저에서 http://localhost:3000으로 접속하여 애플리케이션을 확인할 수 있습니다.
 ```
 
-## 프로젝트 변경 내역
-
-### build.gradle
-
-| 변경 전 | 변경 후 |
-| --- | --- |
-| 신규추가 | `implementation 'org.jsoup:jsoup:1.14.3'`<br>`testImplementation 'org.springframework.boot:spring-boot-starter-test'`<br>`testRuntimeOnly 'org.junit.platform:junit-platform-launcher'` |
-
-### SQL 테이블 추가
-
-`picture_board` 데이터베이스에 `stock` 테이블을 추가하기 위한 SQL 명령어는 다음과 같습니다:
-
-```sql
-USE picture_board;
-
-CREATE TABLE IF NOT EXISTS stock (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    stock_symbol VARCHAR(10),
-    date DATE,
-    open_price FLOAT,
-    close_price FLOAT,
-    high_price FLOAT,
-    low_price FLOAT,
-    volume INT
-);
-```
-
-## 새로 추가된 Java 파일들
-### Stock.java
-### StockService.java
-### StockRepository.java
-### StockController.java
-
-## 추가 설명
-
-| 설명 |
-| --- |
-| `StockTradingApplicationTests`를 실행시키면 DB에 삼성전자가 추가됩니다. |
