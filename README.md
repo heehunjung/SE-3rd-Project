@@ -1,4 +1,4 @@
-#### 소프트웨어공학 프로젝트 - 금융 플랫폼 구현
+### 소프트웨어공학 프로젝트 - 금융 플랫폼 구현
 ## 1. Node.js 설치
 Node.js 공식 사이트에서 최신 LTS 버전(현재 Node.js 18.x)을 다운로드하여 설치합니다.
 ### Node.js 및 npm 버전 확인
@@ -24,9 +24,10 @@ npm start
 ```
 ### 백엔드 실행 (Spring Boot)
 1. MySQL 설정:
-MySQL 서버를 실행하고 picture_board 데이터베이스를 생성합니다:
+MySQL 서버를 실행하고 데이터베이스를 생성 후
+application.properties, application.yml를 각자 환경에 맞게 수정
 ```sql
-CREATE DATABASE picture_board;
+EX) CREATE DATABASE picture_board;
 ```
 2. Spring Boot 애플리케이션 실행
 
