@@ -1,5 +1,6 @@
-package com.seProject.stockTrading.domain.stock;
+package com.seProject.stockTrading.domain.stockPrice;
 
+import com.seProject.stockTrading.domain.stock.Stock;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 

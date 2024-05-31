@@ -1,5 +1,7 @@
 package com.seProject.stockTrading.domain.stock;
 
+import com.seProject.stockTrading.domain.stockPrice.StockPrice;
+import com.seProject.stockTrading.domain.stockPrice.StockPriceRepository;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,11 +22,14 @@ public class StockService {
 
     private static final Logger logger = LoggerFactory.getLogger(StockService.class);
 
-    @Autowired
-    private StockRepository stockRepository;
+    private final StockRepository stockRepository;
+    private final StockPriceRepository stockPriceRepository;
 
     @Autowired
-    private StockPriceRepository stockPriceRepository;
+    public StockService(StockRepository stockRepository, StockPriceRepository stockPriceRepository) {
+        this.stockRepository = stockRepository;
+        this.stockPriceRepository = stockPriceRepository;
+    }
 
     // 주식 데이터를 가져오는 메서드
     public List<StockPrice> fetchStockData(Stock stock, int page) throws Exception {
@@ -80,14 +85,20 @@ public class StockService {
             logger.info("Saved stock: {}", stock);
         }
 
-        for (StockPrice stockPrice : stockPrices) {
-            try {
-                stockPrice.setStock(stock); // Ensure stock is set
-                stockPriceRepository.save(stockPrice);
-                logger.info("Saved stock price: {}", stockPrice);
-            } catch (Exception e) {
-                logger.error("Error saving stock price: {}", e.getMessage());
+        int batchSize = 50; // 트랜잭션당 저장할 데이터 크기 설정
+        for (int i = 0; i < stockPrices.size(); i += batchSize) {
+            int end = Math.min(i + batchSize, stockPrices.size());
+            List<StockPrice> batchList = stockPrices.subList(i, end);
+            for (StockPrice stockPrice : batchList) {
+                try {
+                    stockPrice.setStock(stock); // Ensure stock is set
+                    stockPriceRepository.save(stockPrice);
+                    logger.info("Saved stock price: {}", stockPrice);
+                } catch (Exception e) {
+                    logger.error("Error saving stock price: {}", e.getMessage());
+                }
             }
+            logger.info("Saved stock data batch from {} to {}", i, end);
         }
         logger.info("Saved stock data for symbol {}: {} entries", stock.getStockSymbol(), stockPrices.size());
     }
@@ -100,7 +111,7 @@ public class StockService {
             String symbol = stock.getStockSymbol();
             logger.info("Fetching data for symbol: {}", symbol);
             List<StockPrice> allStockPrices = new ArrayList<>();
-            for (int page = 1; page <= 10; page++) {
+            for (int page = 1; page <= 25; page++) { // 25 페이지까지 데이터를 가져오도록 수정
                 List<StockPrice> stockPrices = fetchStockData(stock, page);
                 allStockPrices.addAll(stockPrices);
                 logger.info("Fetched stock data for symbol {} from page {}: {} entries", symbol, page, stockPrices.size());
@@ -134,15 +145,24 @@ public class StockService {
                         if (hrefParts.length > 1) {
                             String stockSymbol = hrefParts[1];
                             String stockName = linkElement.text().trim();
-                            logger.info("Parsed stock - Symbol: {}, Name: {}", stockSymbol, stockName);
+                            String currentPriceText = tds.get(2).text().trim().replace(",", "");
+                            logger.info("Parsed stock - Symbol: {}, Name: {}, Current Price: {}", stockSymbol, stockName, currentPriceText);
 
-                            Stock stock = new Stock();
-                            stock.setStockSymbol(stockSymbol);
-                            stock.setStockName(stockName);
-                            top100Stocks.add(stock);
+                            try {
+                                float currentPrice = Float.parseFloat(currentPriceText);
 
-                            if (top100Stocks.size() >= 100) {
-                                break;
+                                Stock stock = new Stock();
+                                stock.setStockSymbol(stockSymbol);
+                                stock.setStockName(stockName);
+                                stock.setCurrentPrice(currentPrice);
+
+                                top100Stocks.add(stock);
+
+                                if (top100Stocks.size() >= 100) {
+                                    break;
+                                }
+                            } catch (NumberFormatException e) {
+                                logger.error("Error parsing current price: {}", e.getMessage());
                             }
                         }
                     }

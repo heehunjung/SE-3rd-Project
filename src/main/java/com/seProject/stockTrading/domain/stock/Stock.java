@@ -1,5 +1,6 @@
 package com.seProject.stockTrading.domain.stock;
 
+import com.seProject.stockTrading.domain.stockPrice.StockPrice;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,8 +17,5 @@ public class Stock {
     private Long id;
     private String stockSymbol;
     private String stockName;
-
-    @OneToMany(mappedBy = "stock", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StockPrice> stockPrices;
-
+    private float currentPrice;
 }

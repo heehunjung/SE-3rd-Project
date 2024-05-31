@@ -170,4 +170,13 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("조회수 증가 중 오류가 발생했습니다.");
         }
     }
+/*    //상승률,하락률를 계산하여 table에 넣는 api
+    @CrossOrigin
+    @PostMapping("/changes")
+    public ResponseEntity<?> calculateChanges()*/
+/*    @CrossOrigin
+    @GetMapping("/stockData")
+    public ResponseEntity<?> getStockData() {
+
+    }*/
 }

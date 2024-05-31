@@ -1,5 +1,6 @@
-package com.seProject.stockTrading.domain.stock;
+package com.seProject.stockTrading.domain.stockPrice;
 
+import com.seProject.stockTrading.domain.stock.Stock;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +11,6 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class StockPrice {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,9 +20,7 @@ public class StockPrice {
     private float highPrice;
     private float lowPrice;
     private int volume;
-
     @ManyToOne
     @JoinColumn(name = "stock_id")
     private Stock stock;
-
 }
