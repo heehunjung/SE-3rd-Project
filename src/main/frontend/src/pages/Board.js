@@ -9,20 +9,7 @@ const Board = () => {
     const [error, setError] = useState(null);
     const [boardData, setBoardData] = useState([]);
     const [userData, setUserData] = useState(null);
-    const [stockData, setStockData] = useState(null);
-    useEffect(() => {
-        fetch(`http://localhost:8080/stockData`)
-            .then(response => {
-                if(!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data=>{
-                setStockData(data);
-            })
-            .catch(error=>setError(error.message));
-    });
+
     useEffect(() => {
         fetch(`http://localhost:8080/memberInfo/${id}`)
             .then(response => {

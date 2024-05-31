@@ -125,6 +125,7 @@ public class StockService {
     @Transactional
     public void fetchTop100Stocks() throws Exception {
         String baseUrl = "https://finance.naver.com/sise/sise_market_sum.naver?sosok=0&page=";
+        String detailBaseUrl = "https://finance.naver.com/item/main.naver?code=";
         List<Stock> top100Stocks = new ArrayList<>();
 
         int page = 1;
@@ -151,10 +152,26 @@ public class StockService {
                             try {
                                 float currentPrice = Float.parseFloat(currentPriceText);
 
+                                // 상세 정보 크롤링
+                                String detailUrl = detailBaseUrl + stockSymbol;
+                                Document detailDoc = Jsoup.connect(detailUrl).timeout(60000).get();
+                                Elements pElements = detailDoc.select(".summary_info p"); // p 태그가 있는 요소 선택
+
+                                StringBuilder contentBuilder = new StringBuilder();
+                                for (Element pElement : pElements) {
+                                    contentBuilder.append(pElement.text()).append("\n");
+                                }
+                                String content = contentBuilder.toString().trim();
+
+                                if (content.length() > 65535) {
+                                    content = content.substring(0, 65535); // 최대 길이 제한 (TEXT 타입의 경우)
+                                }
+
                                 Stock stock = new Stock();
                                 stock.setStockSymbol(stockSymbol);
                                 stock.setStockName(stockName);
                                 stock.setCurrentPrice(currentPrice);
+                                stock.setContent(content); // 상세 정보 설정
 
                                 top100Stocks.add(stock);
 
@@ -163,6 +180,8 @@ public class StockService {
                                 }
                             } catch (NumberFormatException e) {
                                 logger.error("Error parsing current price: {}", e.getMessage());
+                            } catch (Exception e) {
+                                logger.error("Error fetching detail information: {}", e.getMessage());
                             }
                         }
                     }
@@ -181,4 +200,5 @@ public class StockService {
         }
         logger.info("Top 100 stocks fetched and saved successfully.");
     }
+
 }

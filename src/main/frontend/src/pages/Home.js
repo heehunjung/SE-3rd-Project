@@ -1,16 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import { Nav, Container } from 'react-bootstrap';
+import {Nav, Container, Badge, Tab, Tabs} from 'react-bootstrap';
 import Navbar from 'react-bootstrap/Navbar';
 import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import {useParams} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import '../App.css';
 
 const Home = () => {
     const { id } = useParams();
     const [userData, setUserData] = useState(null);
     const [error, setError] = useState(null);
+    const [stockData, setStockData] = useState(null);
+
+    useEffect(() => {
+        fetch(`http://localhost:8080/stockData`)
+            .then(response => {
+                if(!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data=>{
+                setStockData(data);
+            })
+            .catch(error=>setError(error.message));
+    },[]);
 
     useEffect(() => {
         fetch(`http://localhost:8080/memberInfo/${id}`)
@@ -28,17 +43,17 @@ const Home = () => {
         <>
             <Navbar bg="dark" data-bs-theme="dark">
                 <Container>
-                        <Navbar.Brand href={`/Home/${id}`}>KW 거래소</Navbar.Brand>
-                        <Nav className="ml-auto">
-                            <Nav.Link href={`/Home/${id}`}>홈 화면</Nav.Link>
-                            <Nav.Link href={`/Trading/${id}`}>주식 구매</Nav.Link>
-                            <Nav.Link href={`/Board/${id}`}>커뮤니티</Nav.Link>
-                            <Nav.Link href={`/MyInfo/${id}`}>내 정보</Nav.Link>
-                            <Nav.Link href={`/Post/${id}`}>게시글 작성</Nav.Link>
+                    <Navbar.Brand href={`/Home/${id}`}>KW 거래소</Navbar.Brand>
+                    <Nav className="ml-auto">
+                        <Nav.Link href={`/Home/${id}`}>홈 화면</Nav.Link>
+                        <Nav.Link href={`/Trading/${id}`}>주식 구매</Nav.Link>
+                        <Nav.Link href={`/Board/${id}`}>커뮤니티</Nav.Link>
+                        <Nav.Link href={`/MyInfo/${id}`}>내 정보</Nav.Link>
+                        <Nav.Link href={`/Post/${id}`}>게시글 작성</Nav.Link>
                     </Nav>
                 </Container>
             </Navbar>
-            <br />
+            <br/>
             <Container>
                 <Row>
                     <Col>
@@ -108,12 +123,29 @@ const Home = () => {
                 <Row>
                     <Col>
                         <Card>
-                            <Card.Header>오늘의 주식</Card.Header>
-                            <Card.Body>
-                                <Card.Text>
-                                    <p>게시글이 없습니다.</p>
-                                </Card.Text>
-                            </Card.Body>
+                            <Card.Header>
+                                <Tabs defaultActiveKey="all" transition={false} id="noanim-tab-example" className="mb-3">
+                                    <Tab eventKey="all" title="전체 주식">
+                                        <Card.Body className="scrollable-card">
+                                            {stockData ? (
+                                                stockData.map(stock => (
+                                                    <p key={stock.id}>
+                                                        <Badge bg="success">주식 이름: {stock.stockName} </Badge>
+                                                        <Badge bg="secondary">종목 코드: {stock.stockSymbol}</Badge>
+                                                        {stock.content ? <strong>{stock.content}</strong> : <strong>정보 미제공</strong>}
+                                                    </p>
+                                                ))
+                                            ) : error ? (
+                                                <p>오류: {error}</p>
+                                            ) : (
+                                                <p>데이터를 불러오는 중...</p>
+                                            )}
+                                        </Card.Body>
+                                    </Tab>
+                                    <Tab eventKey="today" title="오늘의 주식">
+                                    </Tab>
+                                </Tabs>
+                            </Card.Header>
                         </Card>
                     </Col>
                 </Row>

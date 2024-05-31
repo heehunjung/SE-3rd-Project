@@ -1,9 +1,9 @@
 package com.seProject.stockTrading.domain.stock;
 
-import com.seProject.stockTrading.domain.stockPrice.StockPrice;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -18,4 +18,7 @@ public class Stock {
     private String stockSymbol;
     private String stockName;
     private float currentPrice;
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String content;
 }

@@ -11,6 +11,10 @@ import com.seProject.stockTrading.domain.post.Post;
 import com.seProject.stockTrading.domain.post.PostDTO;
 import com.seProject.stockTrading.domain.post.PostRepository;
 import com.seProject.stockTrading.domain.post.PostService;
+import com.seProject.stockTrading.domain.stock.Stock;
+import com.seProject.stockTrading.domain.stock.StockRepository;
+import com.seProject.stockTrading.domain.stock.StockService;
+import com.seProject.stockTrading.domain.stockPrice.StockPriceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,18 +35,24 @@ public class Controller {
     PostRepository postRepository;
     PostService postService;
     CommentRepository commentRepository;
+    StockRepository stockRepository;
+    StockPriceRepository stockPriceRepository;
     @Autowired
     public Controller(
             PostService postService,
             PostRepository postRepository,
             MemberRepository memberRepository,
             MemberService memberService,
-            CommentRepository commentRepository){
+            CommentRepository commentRepository,
+            StockRepository stockRepository,
+            StockPriceRepository stockPriceRepository){
         this.memberRepository = memberRepository;
         this.memberService = memberService;
         this.postRepository = postRepository;
         this.postService = postService;
         this.commentRepository = commentRepository;
+        this.stockRepository = stockRepository;
+        this.stockPriceRepository = stockPriceRepository;
     }
 
     // 모든 게시물을 list 형태로 가져오는 api
@@ -174,9 +184,14 @@ public class Controller {
     @CrossOrigin
     @PostMapping("/changes")
     public ResponseEntity<?> calculateChanges()*/
-/*    @CrossOrigin
+    //Stock table 정보를 요청하는 api
+    @CrossOrigin
     @GetMapping("/stockData")
     public ResponseEntity<?> getStockData() {
-
-    }*/
+        List<Stock> StockData = stockRepository.findAll();
+        if(StockData.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("주식 정보가 없습니다.");
+        }
+        return ResponseEntity.ok(StockData);
+    }
 }
