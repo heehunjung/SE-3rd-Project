@@ -237,4 +237,15 @@ public class Controller {
         List<StockPrice> stockPrices = stockPriceRepository.findAllByStockId(stockId);
         return ResponseEntity.ok(stockPrices);
     }
+    // Stock id로 Stock 찾는 api
+    @CrossOrigin
+    @GetMapping("/stockData/name/{stockName}")
+    public ResponseEntity<?> getStockData(@PathVariable String stockName) {
+        Optional<Stock> stockOpt = stockRepository.findAllByStockName(stockName);
+        if(stockOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 주식 정보가 없습니다.");
+        } else {
+            return ResponseEntity.ok(stockOpt.get());
+        }
+    }
 }

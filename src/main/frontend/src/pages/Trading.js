@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Nav, Container, Form, Button, Row, Col, Card, Badge } from 'react-bootstrap';
 import Navbar from 'react-bootstrap/Navbar';
-import { useLocation, useParams } from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import ReactApexChart from 'react-apexcharts';
 import '../App.css';
 
@@ -14,6 +14,8 @@ const Trading = () => {
     const [stockPrice, setStockPrice] = useState([]);
     const [error, setError] = useState(null);
     const [change, setChange] = useState(null);
+    const [stockName, setStockName] = useState(null);
+    const navigate = useNavigate();
 
     // 해당 주식 데이터 가져옴
     useEffect(() => {
@@ -33,7 +35,6 @@ const Trading = () => {
                 alert(error.message);
             });
     }, [stockId]);
-
     // 해당 주소의 1년치 가격을 가져옴
     useEffect(() => {
         fetch(`http://localhost:8080/stockPrice/${stockId}`)
@@ -51,7 +52,6 @@ const Trading = () => {
                 alert(error.message);
             });
     }, [stockId]);
-
     const getUpAndDown = (stockId) => {
         fetch(`http://localhost:8080/changes/${stockId}`)
             .then(response => {
@@ -68,7 +68,32 @@ const Trading = () => {
                 alert(error.message);
             });
     };
-
+    const handleChange = (e) =>{
+        setStockName(e.target.value);
+    }
+    const handleSubmit =(e)=>{
+        e.preventDefault();
+        if(!stockName){
+            alert('검색 내용을 가져오는 중입니다. 잠시만 기다려주세요.');
+            return;
+        }
+        fetch(`http://localhost:8080/stockData/name/${stockName}`,{
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+            }
+    })
+            .then(res=>{
+                if(!res.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return res.json();
+            })
+            .then(data=>{
+                navigate(`/trading/${id}/?stockId=${data.id}`);
+            })
+            .catch(error => setError(error.message));
+    }
     // ApexCharts 옵션 설정
     const chartOptions = {
         series: [{
@@ -141,7 +166,6 @@ const Trading = () => {
             }
         },
     };
-
     return (
         <>
             <Navbar bg="dark" data-bs-theme="dark">
@@ -161,8 +185,14 @@ const Trading = () => {
                 <Row>
                     <Col>
                         <div className="form-container">
-                            <Form.Control size="lg" type="text" placeholder="주식 이름" />
-                            <Button className="btn-icon2" type="submit">🔍</Button>
+                            <Form.Control
+                                size="lg"
+                                type="text"
+                                placeholder="주식 이름"
+                                value={stockName}
+                                onChange={handleChange}
+                            />
+                            <Button className="btn-icon2" onClick={handleSubmit} type="submit">🔍</Button>
                         </div>
                     </Col>
                 </Row>
