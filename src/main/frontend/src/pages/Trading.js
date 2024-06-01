@@ -123,10 +123,6 @@ const Trading = () => {
         },
     };
 
- /*   const getUpAndDown =()=>{
-        fetch(`http://localhost:8080/changes/${stockId}`)
-            .then(res=>)
-    }*/
     return (
         <>
             <Navbar bg="dark" data-bs-theme="dark">
