@@ -118,7 +118,7 @@ const View = () => {
                 console.error('Error fetching comments:', error);
                 setComments([]);
             });
-    }, [id, comments]);
+    }, [id],[comments]);
 
     const handleEdit = () => {
         navigate(`/Post/${memberId}?postId=${id}`);

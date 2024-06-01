@@ -73,7 +73,7 @@ const Home = () => {
         <>
             <Navbar bg="dark" data-bs-theme="dark">
                 <Container>
-                    <Navbar.Brand href={`/Home/${id}`}>KW 거래소</Navbar.Brand>
+                    <Navbar.Brand href={`/Home/${id}`}>KW 거래소📉</Navbar.Brand>
                     <Nav className="ml-auto">
                         <Nav.Link href={`/Home/${id}`}>홈 화면</Nav.Link>
                         <Nav.Link href={`/Trading/${id}`}>주식 구매</Nav.Link>
