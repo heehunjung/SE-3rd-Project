@@ -63,7 +63,7 @@ const Board = () => {
 
     return (
         <>
-            <Navbar bg="dark" variant="dark">
+            <Navbar bg="dark" data-bs-theme="dark">
                 <Container>
                     <Navbar.Brand href={`/Home/${id}`}>KW 거래소📉</Navbar.Brand>
                     <Nav className="ml-auto">
@@ -78,7 +78,7 @@ const Board = () => {
             <br />
             <Container>
                 <Row>
-                    <Col md={9}>
+                    <Col>
                         <Card>
                             <Card.Header>
                                 <Tabs defaultActiveKey="all" transition={false} id="noanim-tab-example" className="mb-3">

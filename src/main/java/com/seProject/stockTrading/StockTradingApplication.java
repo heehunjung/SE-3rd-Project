@@ -7,16 +7,15 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class StockTradingApplication implements CommandLineRunner {
+public class StockTradingApplication /*implements CommandLineRunner */{
 
-	@Autowired
-	private StockService stockService;
+/*	@Autowired
+	private StockService stockService;*/
 
 	public static void main(String[] args) {
 		SpringApplication.run(StockTradingApplication.class, args);
 	}
-
-	@Override
+/*	@Override
 	public void run(String... args) {
 		try {
 			stockService.fetchTop100Stocks();
@@ -27,5 +26,5 @@ public class StockTradingApplication implements CommandLineRunner {
 			e.printStackTrace();
 			System.out.println("An error occurred: " + e.getMessage());
 		}
-	}
+	}*/
 }

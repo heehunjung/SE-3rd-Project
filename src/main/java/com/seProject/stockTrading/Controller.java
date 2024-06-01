@@ -6,23 +6,21 @@ import com.seProject.stockTrading.domain.member.Member;
 import com.seProject.stockTrading.domain.member.MemberDTO;
 import com.seProject.stockTrading.domain.member.MemberRepository;
 import com.seProject.stockTrading.domain.member.MemberService;
-
 import com.seProject.stockTrading.domain.post.Post;
-import com.seProject.stockTrading.domain.post.PostDTO;
 import com.seProject.stockTrading.domain.post.PostRepository;
 import com.seProject.stockTrading.domain.post.PostService;
 import com.seProject.stockTrading.domain.stock.Stock;
 import com.seProject.stockTrading.domain.stock.StockRepository;
-import com.seProject.stockTrading.domain.stock.StockService;
+import com.seProject.stockTrading.domain.stockPrice.StockPrice;
 import com.seProject.stockTrading.domain.stockPrice.StockPriceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.servlet.HttpEncodingAutoConfiguration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +28,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RestController
 public class Controller {
+    private final HttpEncodingAutoConfiguration httpEncodingAutoConfiguration;
     MemberRepository memberRepository;
     MemberService memberService;
     PostRepository postRepository;
@@ -45,7 +44,7 @@ public class Controller {
             MemberService memberService,
             CommentRepository commentRepository,
             StockRepository stockRepository,
-            StockPriceRepository stockPriceRepository){
+            StockPriceRepository stockPriceRepository, HttpEncodingAutoConfiguration httpEncodingAutoConfiguration){
         this.memberRepository = memberRepository;
         this.memberService = memberService;
         this.postRepository = postRepository;
@@ -53,6 +52,7 @@ public class Controller {
         this.commentRepository = commentRepository;
         this.stockRepository = stockRepository;
         this.stockPriceRepository = stockPriceRepository;
+        this.httpEncodingAutoConfiguration = httpEncodingAutoConfiguration;
     }
 
     // 모든 게시물을 list 형태로 가져오는 api
@@ -65,6 +65,7 @@ public class Controller {
         }
         return ResponseEntity.ok(postInfo);
     }
+    // 특정 게시물을 가져오는 api
     @CrossOrigin
     @GetMapping("/board/{id}")
     public ResponseEntity<?> getBoard(@PathVariable Long id){
@@ -85,6 +86,7 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 멤버의 데이터가 존재하지 않아요.");
         }
     }
+    // 해당 게시글의 댓글을 리스트 형태로 가져오는 api
     @CrossOrigin
     @GetMapping("/getComment/{postId}")
     public ResponseEntity<?> getCommentsByPostId(@PathVariable Long postId) {
@@ -180,11 +182,34 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("조회수 증가 중 오류가 발생했습니다.");
         }
     }
-/*    //상승률,하락률를 계산하여 table에 넣는 api
+    // 상승률,하락률를 계산하여 table에 넣는 api
     @CrossOrigin
-    @PostMapping("/changes")
-    public ResponseEntity<?> calculateChanges()*/
-    //Stock table 정보를 요청하는 api
+    @GetMapping("/changes/{stockId}")
+    public ResponseEntity<?> calculate(@PathVariable Long stockId) {
+        Optional<Stock> currentStockOpt = stockRepository.findById(stockId);
+        if (currentStockOpt.isEmpty()) {
+            return ResponseEntity.status(404).body("주식 정보가 없습니다.");
+        }
+
+        Optional<StockPrice> currentPriceOpt = stockPriceRepository.findTop1ByStockIdOrderByDateDesc(stockId);
+        if (currentPriceOpt.isEmpty()) {
+            return ResponseEntity.status(404).body("주식 가 정보가 없습니다.");
+        }
+
+        StockPrice currentPrice = currentPriceOpt.get();
+
+        LocalDate yesterday = currentPrice.getDate().minusDays(1);
+        Optional<StockPrice> pastPriceOpt = stockPriceRepository.findTop1ByStockIdAndDateLessThanOrderByDateDesc(stockId, yesterday);
+        if (pastPriceOpt.isEmpty()) {
+            return ResponseEntity.status(404).body("하루 전 주식 가격 정보가 없습니다.");
+        }
+
+        StockPrice pastPrice = pastPriceOpt.get();
+
+        float change = (currentPrice.getClosingPrice() - pastPrice.getClosingPrice()) / pastPrice.getClosingPrice();
+        return ResponseEntity.ok(change);
+    }
+    // Stock table 정보를 요청하는 api
     @CrossOrigin
     @GetMapping("/stockData")
     public ResponseEntity<?> getStockData() {
@@ -193,5 +218,23 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("주식 정보가 없습니다.");
         }
         return ResponseEntity.ok(StockData);
+    }
+    // 특정 Stock 정보를 전달하는 api
+    @CrossOrigin
+    @GetMapping("/stockData/{stockId}")
+    public ResponseEntity<?> getStockData(@PathVariable Long stockId) {
+        Optional<Stock> stockOpt = stockRepository.findById(stockId);
+        if(stockOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 주식 정보가 없습니다.");
+        } else {
+            return ResponseEntity.ok(stockOpt.get());
+        }
+    }
+    // 특정 Stock Price 정보를 전달하는 api
+    @CrossOrigin
+    @GetMapping("/stockPrice/{stockId}")
+    public ResponseEntity<?> getStockPrice(@PathVariable Long stockId) {
+        List<StockPrice> stockPrices = stockPriceRepository.findAllByStockId(stockId);
+        return ResponseEntity.ok(stockPrices);
     }
 }
