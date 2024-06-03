@@ -8,7 +8,7 @@ import { Link, useParams } from "react-router-dom";
 import '../App.css';
 
 const Home = () => {
-    const { id } = useParams();
+    const { id } = useParams(); // memberId를 path variable로 받음
     const [userData, setUserData] = useState(null);
     const [error, setError] = useState(null);
     const [stockData, setStockData] = useState([]);
@@ -93,9 +93,11 @@ const Home = () => {
                                 {topGainers.length > 0 ? (
                                     topGainers.map(stock => (
                                         <p key={stock.id}>
-                                            <Badge bg="success">주식 이름: {stock.stockName} </Badge>
-                                            <Badge bg="secondary">종목 코드: {stock.stockSymbol}</Badge>
-                                            <Badge bg="danger">상승률: {(stock.gain * 100).toFixed(2)}%</Badge>
+                                            <Link to={`/Trading/${id}?stockId=${stock.id}`} style={{ color: '#ffcc00', textDecoration: 'none', fontSize: '1.1em', fontWeight: 'bold' }}>
+                                                {stock.stockName}
+                                            </Link>
+                                            <Badge bg="secondary" style={{ marginLeft: '10px' }}>종목 코드: {stock.stockSymbol}</Badge>
+                                            <Badge bg="danger" style={{ marginLeft: '10px' }}>상승률: {(stock.gain * 100).toFixed(2)}%</Badge>
                                         </p>
                                     ))
                                 ) : error ? (
@@ -113,9 +115,11 @@ const Home = () => {
                                 {topLosers.length > 0 ? (
                                     topLosers.map(stock => (
                                         <p key={stock.id}>
-                                            <Badge bg="success">주식 이름: {stock.stockName} </Badge>
-                                            <Badge bg="secondary">종목 코드: {stock.stockSymbol}</Badge>
-                                            <Badge bg="info">하락률: {(stock.gain * 100).toFixed(2)}%</Badge>
+                                            <Link to={`/Trading/${id}?stockId=${stock.id}`} style={{ color: '#ffcc00', textDecoration: 'none', fontSize: '1.1em', fontWeight: 'bold' }}>
+                                                {stock.stockName}
+                                            </Link>
+                                            <Badge bg="secondary" style={{ marginLeft: '10px' }}>종목 코드: {stock.stockSymbol}</Badge>
+                                            <Badge bg="info" style={{ marginLeft: '10px' }}>하락률: {(stock.gain * 100).toFixed(2)}%</Badge>
                                         </p>
                                     ))
                                 ) : error ? (
@@ -155,8 +159,10 @@ const Home = () => {
                                             {stockData.length > 0 ? (
                                                 stockData.map(stock => (
                                                     <p key={stock.id}>
-                                                        <Badge bg="success">주식 이름: {stock.stockName} </Badge>
-                                                        <Badge bg="secondary">종목 코드: {stock.stockSymbol}</Badge>
+                                                        <Link to={`/Trading/${id}?stockId=${stock.id}`} style={{ color: '#ffcc00', textDecoration: 'none', fontSize: '1.1em', fontWeight: 'bold' }}>
+                                                            {stock.stockName}
+                                                        </Link>
+                                                        <Badge bg="secondary" style={{ marginLeft: '10px' }}>종목 코드: {stock.stockSymbol}</Badge>
                                                         <br />
                                                         {stock.content ? <strong>{stock.content}</strong> : <strong>정보 미제공</strong>}
                                                     </p>
