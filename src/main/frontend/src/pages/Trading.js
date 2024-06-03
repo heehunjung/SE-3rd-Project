@@ -23,7 +23,7 @@ const Trading = () => {
         stockQuantity:'',
         stockId:stockId
     });
-
+    const [totalAmount,setTotalAmount] = useState(null);
     // 해당 주식 데이터 가져옴
     useEffect(() => {
         fetch(`http://localhost:8080/stockData/${stockId}`)
@@ -94,12 +94,20 @@ const Trading = () => {
     }
     //입력받은 매도/매수 정보를 객체에 저장
     const handleChangeBuySell = (e) =>{
+        if(!stock){
+            alert('주식 정보를 가져오고있습니다. 잠시만 기다려주세요.');
+            return;
+        }
         setSellBuy({
             ...setSellBuy,
             [e.target.name]: e.target.value,
-            stockId: stockId
+            stockId: stockId,
+            stockName: stock.stockName
             }
         );
+        if (e.target.name=== 'stockQuantity' && stock) {
+            setTotalAmount(e.target.value * stock.currentPrice);
+        }
     }
     //검색 주식을 확인하는 메소드
     const handleSubmit = (e) => {
@@ -131,6 +139,10 @@ const Trading = () => {
     //매도 매수 api 요청하는 메소드
     const onSellBuySubmit = (e,action) => {
         e.preventDefault();
+        if(!sellBuy) {
+            alert('입력한 주식 정보를 저장 중입니다. 잠시만 기다려주세요.');
+            return;
+        }
         const url = action === 'sell' ? `http://localhost:8080/sell/${id}` : `http://localhost:8080/buy/${id}`;
         fetch(url,{
             method:'POST',
@@ -303,7 +315,7 @@ const Trading = () => {
                     <Col md={3}>
                         <Card className="mb-4 shadow-sm card-custom">  {/* 둥근 모서리를 위해 Card로 감쌌습니다 */}
                             <Card.Header>
-                                <h4>보유 잔고: {userData && userData.balance}</h4>
+                                <h4>보유 잔고🏦 {userData && userData.balance}원</h4>
                             </Card.Header>
                         </Card>                        <Card className="mb-4 shadow-sm card-custom">
                             <Card.Header>
@@ -315,8 +327,8 @@ const Trading = () => {
                                         type="text"
                                         placeholder="주식 이름을 입력해주세요"
                                         name="stockName" // 추가
-                                        value={sellBuy.stockName}
-                                        onChange={handleChangeBuySell}
+                                        value={stock && stock.stockName}
+                                        readOnly
                                         className="small-placeholder"
                                     />
                                     매도/매수 수량
@@ -328,6 +340,15 @@ const Trading = () => {
                                         value={sellBuy.stockQuantity}
                                         onChange={handleChangeBuySell}
                                         className="small-placeholder"
+                                    />
+                                    총 금액(원)
+                                    <Form.Control
+                                        size="lg"
+                                        type="text"
+                                        placeholder="총 금액"
+                                        className="small-placeholder"
+                                        value={totalAmount}
+                                        readOnly
                                     />
                                     <div className="button-group" style={{ margin: '10px' }}>
                                         <Button variant="danger" className="trade-button" onClick={(e) => onSellBuySubmit(e, 'sell')}>매도</Button>
