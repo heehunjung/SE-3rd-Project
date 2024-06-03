@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Nav, Container, Form, Button, Row, Col, Card } from 'react-bootstrap';
+import { Nav, Container, Form, Button, Row, Col, Card, Badge } from 'react-bootstrap';
 import Navbar from 'react-bootstrap/Navbar';
-import { useLocation, useParams } from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import ReactApexChart from 'react-apexcharts';
 import '../App.css';
 
@@ -13,6 +13,9 @@ const Trading = () => {
     const [stock, setStock] = useState(null);
     const [stockPrice, setStockPrice] = useState([]);
     const [error, setError] = useState(null);
+    const [change, setChange] = useState(null);
+    const [stockName, setStockName] = useState(null);
+    const navigate = useNavigate();
 
     // 해당 주식 데이터 가져옴
     useEffect(() => {
@@ -25,13 +28,13 @@ const Trading = () => {
             })
             .then(data => {
                 setStock(data);
+                getUpAndDown(data.id);
             })
             .catch(error => {
                 setError(error.message);
                 alert(error.message);
             });
     }, [stockId]);
-
     // 해당 주소의 1년치 가격을 가져옴
     useEffect(() => {
         fetch(`http://localhost:8080/stockPrice/${stockId}`)
@@ -49,7 +52,48 @@ const Trading = () => {
                 alert(error.message);
             });
     }, [stockId]);
-
+    const getUpAndDown = (stockId) => {
+        fetch(`http://localhost:8080/changes/${stockId}`)
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                setChange(data);
+            })
+            .catch(error => {
+                setError(error.message);
+                alert(error.message);
+            });
+    };
+    const handleChange = (e) =>{
+        setStockName(e.target.value);
+    }
+    const handleSubmit =(e)=>{
+        e.preventDefault();
+        if(!stockName){
+            alert('검색 내용을 가져오는 중입니다. 잠시만 기다려주세요.');
+            return;
+        }
+        fetch(`http://localhost:8080/stockData/name/${stockName}`,{
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+            }
+    })
+            .then(res=>{
+                if(!res.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return res.json();
+            })
+            .then(data=>{
+                navigate(`/trading/${id}/?stockId=${data.id}`);
+            })
+            .catch(error => setError(error.message));
+    }
     // ApexCharts 옵션 설정
     const chartOptions = {
         series: [{
@@ -60,7 +104,7 @@ const Trading = () => {
             chart: {
                 type: 'area',
                 stacked: false,
-                height: 350,
+                height: 400,
                 zoom: {
                     type: 'x',
                     enabled: true,
@@ -122,12 +166,11 @@ const Trading = () => {
             }
         },
     };
-
     return (
         <>
             <Navbar bg="dark" data-bs-theme="dark">
                 <Container>
-                    <Navbar.Brand href={`/Home/${id}`}>KW 거래소</Navbar.Brand>
+                    <Navbar.Brand href={`/Home/${id}`}>KW 거래소📉</Navbar.Brand>
                     <Nav className="ml-auto">
                         <Nav.Link href={`/Home/${id}`}>홈 화면</Nav.Link>
                         <Nav.Link href={`/Trading/${id}`}>주식 구매</Nav.Link>
@@ -142,8 +185,14 @@ const Trading = () => {
                 <Row>
                     <Col>
                         <div className="form-container">
-                            <Form.Control size="lg" type="text" placeholder="주식 이름" />
-                            <Button className="btn-icon2" type="submit">🔍</Button>
+                            <Form.Control
+                                size="lg"
+                                type="text"
+                                placeholder="주식 이름"
+                                value={stockName}
+                                onChange={handleChange}
+                            />
+                            <Button className="btn-icon2" onClick={handleSubmit} type="submit">🔍</Button>
                         </div>
                     </Col>
                 </Row>
@@ -152,17 +201,26 @@ const Trading = () => {
                         <Card className="mb-4 shadow-sm card-custom">
                             <Card.Title>
                                 <Card.Header>
-                                {error && <p>오류: {error}</p>}
-                                {!stock && !error && <p>데이터를 불러오는 중...</p>}
-                                {stock && (
-                                    <>
-                                    <h3>{stock.stockName}</h3><h4>{stock.currentPrice}원</h4>
-                                    </>
-                                )}
+                                    {error && <p>오류: {error}</p>}
+                                    {!stock && !error && <p>데이터를 불러오는 중...</p>}
+                                    {stock && (
+                                        <>
+                                            <h3>{stock.stockName}</h3>
+                                            <div style={{display: 'flex', alignItems: 'center'}}>
+                                                {stock.currentPrice}원
+                                                <Badge
+                                                    bg={change > 0 ? 'danger' : 'primary'}
+                                                    style={{marginLeft: '10px'}}
+                                                >
+                                                    {change !== null ? (change > 0 ? '📈' : '📉') + (change * 100).toFixed(2) : 'N/A'}%
+                                                </Badge>
+                                            </div>
+                                        </>
+                                    )}
                                 </Card.Header>
-                                </Card.Title>
+                            </Card.Title>
                             <Card.Body>
-                                <div style={{ height: 400 }}>
+                                <div style={{height: 370}}>
                                     <ReactApexChart options={chartOptions.options} series={chartOptions.series} type="area" height={350} />
                                 </div>
                             </Card.Body>
