@@ -73,13 +73,18 @@ const Home = () => {
         <>
             <Navbar bg="dark" data-bs-theme="dark">
                 <Container>
-                    <Navbar.Brand href={`/Home/${id}`}>KW 거래소📉</Navbar.Brand>
+                    {userData && userData.role === 'ADMIN' ? (
+                        <Navbar.Brand href={`/Home/${id}`}>KW 거래소📉 관리자 모드</Navbar.Brand>
+                    ) : (
+                        <Navbar.Brand href={`/Home/${id}`}>KW 거래소📉</Navbar.Brand>
+                    )}
                     <Nav className="ml-auto">
                         <Nav.Link href={`/Home/${id}`}>홈 화면</Nav.Link>
                         <Nav.Link href={`/Trading/${id}`}>주식 구매</Nav.Link>
                         <Nav.Link href={`/Board/${id}`}>커뮤니티</Nav.Link>
                         <Nav.Link href={`/MyInfo/${id}`}>내 정보</Nav.Link>
                         <Nav.Link href={`/Post/${id}`}>게시글 작성</Nav.Link>
+                        <Nav.Link href={'/Login'}>로그아웃</Nav.Link>
                     </Nav>
                 </Container>
             </Navbar>
@@ -93,7 +98,7 @@ const Home = () => {
                                 {topGainers.length > 0 ? (
                                     topGainers.map(stock => (
                                         <p key={stock.id}>
-                                            <Link to={`/Trading/${id}?stockId=${stock.id}`} style={{ color: '#ffcc00', textDecoration: 'none', fontSize: '1.1em', fontWeight: 'bold' }}>
+                                            <Link to={`/Trading/${id}?stockId=${stock.id}`} style={{ color: 'white', textDecoration: 'none', fontSize: '1.1em', fontWeight: 'bold' }}>
                                                 {stock.stockName}
                                             </Link>
                                             <Badge bg="secondary" style={{ marginLeft: '10px' }}>종목 코드: {stock.stockSymbol}</Badge>
@@ -115,7 +120,7 @@ const Home = () => {
                                 {topLosers.length > 0 ? (
                                     topLosers.map(stock => (
                                         <p key={stock.id}>
-                                            <Link to={`/Trading/${id}?stockId=${stock.id}`} style={{ color: '#ffcc00', textDecoration: 'none', fontSize: '1.1em', fontWeight: 'bold' }}>
+                                            <Link to={`/Trading/${id}?stockId=${stock.id}`} style={{ color: 'white', textDecoration: 'none', fontSize: '1.1em', fontWeight: 'bold' }}>
                                                 {stock.stockName}
                                             </Link>
                                             <Badge bg="secondary" style={{ marginLeft: '10px' }}>종목 코드: {stock.stockSymbol}</Badge>
@@ -159,12 +164,12 @@ const Home = () => {
                                             {stockData.length > 0 ? (
                                                 stockData.map(stock => (
                                                     <p key={stock.id}>
-                                                        <Link to={`/Trading/${id}?stockId=${stock.id}`} style={{ color: '#ffcc00', textDecoration: 'none', fontSize: '1.1em', fontWeight: 'bold' }}>
+                                                        <Link to={`/Trading/${id}?stockId=${stock.id}`} style={{ color: 'white', textDecoration: 'none', fontSize: '1.1em', fontWeight: 'bold' }}>
                                                             {stock.stockName}
                                                         </Link>
-                                                        <Badge bg="secondary" style={{ marginLeft: '10px' }}>종목 코드: {stock.stockSymbol}</Badge>
+                                                        <Badge bg="secondary" style={{ marginLeft: '10px'}}>종목 코드: {stock.stockSymbol}</Badge>
                                                         <br />
-                                                        {stock.content ? <strong>{stock.content}</strong> : <strong>정보 미제공</strong>}
+                                                        {stock.content ? <strong style={{fontSize: '0.8em'}} >{stock.content}</strong> : <strong style={{fontSize: '0.9em'}}>정보 미제공</strong>}
                                                     </p>
                                                 ))
                                             ) : error ? (

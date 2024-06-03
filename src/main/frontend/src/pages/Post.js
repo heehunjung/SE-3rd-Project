@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from "react-bootstrap/Navbar";
 import { Container, Form, Nav, Button } from "react-bootstrap";
-import {useParams, useNavigate, useLocation} from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 
 const Post = () => {
     const { id } = useParams();
@@ -14,7 +14,6 @@ const Post = () => {
         board: '',
         view: 0
     });
-    const [role, setRole] = useState("");
     const [userData, setUserData] = useState(null);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
@@ -37,7 +36,6 @@ const Post = () => {
             })
             .then(data => {
                 setUserData(data);
-                setRole(data.role); // 멤버 객체에서 역할 정보 설정
             })
             .catch(error => {
                 setError(error.message);
@@ -92,7 +90,7 @@ const Post = () => {
             body: JSON.stringify(postData),
         })
             .then((response) => {
-                if (response.status === 201 || response.status ===200) {
+                if (response.status === 201 || response.status === 200) {
                     return response.text(); // JSON 대신 텍스트로 응답 처리
                 } else {
                     return response.text().then(text => Promise.reject(text || '게시글 업로드에 실패하였습니다.'));
@@ -112,13 +110,22 @@ const Post = () => {
         <>
             <Navbar bg="dark" data-bs-theme="dark">
                 <Container>
-                    <Navbar.Brand href={`/Home/${id}`}>KW 거래소📉</Navbar.Brand>
+                    {userData ? (
+                        userData.role === 'ADMIN' ? (
+                            <Navbar.Brand href={`/Home/${id}`}>KW 거래소📉 관리자 모드</Navbar.Brand>
+                        ) : (
+                            <Navbar.Brand href={`/Home/${id}`}>KW 거래소📉</Navbar.Brand>
+                        )
+                    ) : (
+                        <Navbar.Brand>로딩 중...</Navbar.Brand>
+                    )}
                     <Nav className="ml-auto">
                         <Nav.Link href={`/Home/${id}`}>홈 화면</Nav.Link>
                         <Nav.Link href={`/Trading/${id}`}>주식 구매</Nav.Link>
                         <Nav.Link href={`/Board/${id}`}>커뮤니티</Nav.Link>
                         <Nav.Link href={`/MyInfo/${id}`}>내 정보</Nav.Link>
                         <Nav.Link href={`/Post/${id}`}>게시글 작성</Nav.Link>
+                        <Nav.Link href={'/Login'}>로그아웃</Nav.Link>
                     </Nav>
                 </Container>
             </Navbar>
@@ -156,7 +163,7 @@ const Post = () => {
                             <option value="">게시판을 선택해주세요</option>
                             <option value="2">종토방</option>
                             <option value="3">자유게시판</option>
-                            {role === "ADMIN" && (
+                            {userData && userData.role === "ADMIN" && (
                                 <option value="1">공지사항</option>
                             )}
                         </Form.Control>

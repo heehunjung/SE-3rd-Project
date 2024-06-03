@@ -16,6 +16,7 @@ const Trading = () => {
     const [change, setChange] = useState(null);
     const [stockName, setStockName] = useState(null);
     const navigate = useNavigate();
+    const [userData, setUserData] = useState(null);
 
     // 해당 주식 데이터 가져옴
     useEffect(() => {
@@ -52,6 +53,17 @@ const Trading = () => {
                 alert(error.message);
             });
     }, [stockId]);
+    useEffect(() => {
+        fetch(`http://localhost:8080/memberInfo/${id}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => setUserData(data))
+            .catch(error => setError(error.message));
+    }, [id]);
     const getUpAndDown = (stockId) => {
         fetch(`http://localhost:8080/changes/${stockId}`)
             .then(response => {
@@ -170,13 +182,18 @@ const Trading = () => {
         <>
             <Navbar bg="dark" data-bs-theme="dark">
                 <Container>
-                    <Navbar.Brand href={`/Home/${id}`}>KW 거래소📉</Navbar.Brand>
+                    {userData && userData.role === 'ADMIN' ? (
+                        <Navbar.Brand href={`/Home/${id}`}>KW 거래소📉 관리자 모드</Navbar.Brand>
+                    ) : (
+                        <Navbar.Brand href={`/Home/${id}`}>KW 거래소📉</Navbar.Brand>
+                    )}
                     <Nav className="ml-auto">
                         <Nav.Link href={`/Home/${id}`}>홈 화면</Nav.Link>
                         <Nav.Link href={`/Trading/${id}`}>주식 구매</Nav.Link>
                         <Nav.Link href={`/Board/${id}`}>커뮤니티</Nav.Link>
                         <Nav.Link href={`/MyInfo/${id}`}>내 정보</Nav.Link>
                         <Nav.Link href={`/Post/${id}`}>게시글 작성</Nav.Link>
+                        <Nav.Link href={'/Login'}>로그아웃</Nav.Link>
                     </Nav>
                 </Container>
             </Navbar>

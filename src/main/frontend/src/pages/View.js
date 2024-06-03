@@ -150,13 +150,18 @@ const View = () => {
         <>
             <Navbar bg="dark" variant="dark">
                 <Container>
-                    <Navbar.Brand href={`/Home/${memberId}`}>KW 거래소📉</Navbar.Brand>
+                    {userData && userData.role === 'ADMIN' ? (
+                        <Navbar.Brand href={`/Home/${id}`}>KW 거래소📉 관리자 모드</Navbar.Brand>
+                    ) : (
+                        <Navbar.Brand href={`/Home/${id}`}>KW 거래소📉</Navbar.Brand>
+                    )}
                     <Nav className="ml-auto">
                         <Nav.Link href={`/Home/${memberId}`}>홈 화면</Nav.Link>
                         <Nav.Link href={`/Trading/${memberId}`}>주식 구매</Nav.Link>
                         <Nav.Link href={`/Board/${memberId}`}>커뮤니티</Nav.Link>
                         <Nav.Link href={`/MyInfo/${memberId}`}>내 정보</Nav.Link>
                         <Nav.Link href={`/Post/${memberId}`}>게시글 작성</Nav.Link>
+                        <Nav.Link href={'/Login'}>로그아웃</Nav.Link>
                     </Nav>
                 </Container>
             </Navbar>

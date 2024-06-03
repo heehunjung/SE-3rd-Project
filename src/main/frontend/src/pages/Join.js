@@ -23,18 +23,38 @@ const Join = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        fetch('http://localhost:8080/join', {
-            method: 'POST',
+
+        // 닉네임 중복 체크 먼저 수행
+        fetch(`http://localhost:8080/nickname/${formData.nickname}`, {
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json; charset=utf-8',
-            },
-            body: JSON.stringify(formData),
+            }
         })
+            .then((response) => {
+                if (response.ok) {
+                    return response.text().then((text) => Promise.reject("중복된 닉네임입니다."));
+                } else {
+                    return response.text(); // 사용 가능한 닉네임에 대한 메시지 반환
+                }
+            })
+            .then((message) => {
+                console.log(message);
+
+                // 닉네임 사용 가능 시 가입 요청
+                return fetch('http://localhost:8080/join', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json; charset=utf-8',
+                    },
+                    body: JSON.stringify(formData),
+                });
+            })
             .then((res) => {
                 if (res.status === 201) {
                     return res.json();
                 } else {
-                    return Promise.reject('회원 가입에 실패했습니다.');
+                    return res.text().then((text) => Promise.reject(text));
                 }
             })
             .then((data) => {
@@ -43,9 +63,10 @@ const Join = () => {
             })
             .catch((error) => {
                 console.error('Error:', error);
-                alert(error);
+                alert(error); // 오류 메시지 팝업 표시
             });
     };
+
 
     return (
         <div className="d-flex justify-content-center align-items-center vh-100">

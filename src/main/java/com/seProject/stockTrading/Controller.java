@@ -248,4 +248,15 @@ public class Controller {
             return ResponseEntity.ok(stockOpt.get());
         }
     }
+    //닉네임 중복 체크를 위한 api
+    @CrossOrigin
+    @GetMapping("/nickname/{nickName}")
+    public ResponseEntity<?> getNickname(@PathVariable String nickName) {
+        Optional<Member> memberOpt = memberRepository.findByNickname(nickName);
+        if(memberOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용가능한 닉네임입니다.");
+        } else {
+            return ResponseEntity.ok("중복된 닉네임입니다.");
+        }
+    }
 }
