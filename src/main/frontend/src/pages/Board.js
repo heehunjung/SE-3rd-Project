@@ -41,7 +41,14 @@ const Board = () => {
     };
 
     const sortPostsByDate = (posts) => {
-        return posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        // 공지사항을 우선적으로 정렬
+        const noticePosts = posts.filter(post => post.board === 1);
+        const otherPosts = posts.filter(post => post.board !== 1);
+
+        const sortedNoticePosts = noticePosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        const sortedOtherPosts = otherPosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        return [...sortedNoticePosts, ...sortedOtherPosts];
     };
 
     const topPosts = boardData
@@ -142,7 +149,7 @@ const Board = () => {
                                                     <br/>
                                                     <Link
                                                         className="custom-link"
-                                                        to={`/ViewPost/${post.id}?memberId=${id}`}
+                                                        to={`/ViewPost/${post.id}?memberId={id}`}
                                                     >
                                                         {post.title}
                                                     </Link>
@@ -163,7 +170,7 @@ const Board = () => {
                                                     <br/>
                                                     <Link
                                                         className="custom-link"
-                                                        to={`/ViewPost/${post.id}?memberId=${id}`}
+                                                        to={`/ViewPost/{post.id}?memberId={id}`}
                                                     >
                                                         {post.title}
                                                     </Link>
@@ -185,8 +192,8 @@ const Board = () => {
                                         <Badge bg="secondary">조회수: {post.view}</Badge>
                                         <span
                                             style={{fontSize: '0.8em', color: 'gray', marginLeft: '10px'}}>
-                                                        {new Date(post.createdAt).toLocaleString()}
-                                                    </span>
+                                            {new Date(post.createdAt).toLocaleString()}
+                                        </span>
                                         <br/>
                                         <Link
                                             className="custom-link"
