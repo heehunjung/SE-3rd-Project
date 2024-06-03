@@ -4,6 +4,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import ReactApexChart from 'react-apexcharts';
 import '../App.css';
+import './Board.css'; // 추가된 스타일 시트
 
 const Trading = () => {
     const { id } = useParams();
@@ -17,6 +18,11 @@ const Trading = () => {
     const [stockName, setStockName] = useState(null);
     const navigate = useNavigate();
     const [userData, setUserData] = useState(null);
+    const [sellBuy, setSellBuy] = useState({
+        stockName:'',
+        stockQuantity:'',
+        stockId:stockId
+    });
 
     // 해당 주식 데이터 가져옴
     useEffect(() => {
@@ -53,6 +59,7 @@ const Trading = () => {
                 alert(error.message);
             });
     }, [stockId]);
+    // id를 통해 멤버 객체를 가져옴
     useEffect(() => {
         fetch(`http://localhost:8080/memberInfo/${id}`)
             .then(response => {
@@ -64,6 +71,7 @@ const Trading = () => {
             .then(data => setUserData(data))
             .catch(error => setError(error.message));
     }, [id]);
+    //주식의 상승률 , 하락률을 계산하는 메소드
     const getUpAndDown = (stockId) => {
         fetch(`http://localhost:8080/changes/${stockId}`)
             .then(response => {
@@ -80,9 +88,20 @@ const Trading = () => {
                 alert(error.message);
             });
     };
+    //입력받은 주식이름을 객체에 저장
     const handleChange = (e) =>{
         setStockName(e.target.value);
     }
+    //입력받은 매도/매수 정보를 객체에 저장
+    const handleChangeBuySell = (e) =>{
+        setSellBuy({
+            ...setSellBuy,
+            [e.target.name]: e.target.value,
+            stockId: stockId
+            }
+        );
+    }
+    //검색 주식을 확인하는 메소드
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!stockName) {
@@ -105,11 +124,42 @@ const Trading = () => {
                 navigate(`/trading/${id}/?stockId=${data.id}`);
             })
             .catch(error => {
-                alert(error.message); // 오류 메시지를 alert로 표시
+                alert(error.message); // 오류 메시지를 출력
                 console.log(error.message); // 오류 메시지를 콘솔에 출력
             });
     }
-
+    //매도 매수 api 요청하는 메소드
+    const onSellBuySubmit = (e,action) => {
+        e.preventDefault();
+        const url = action === 'sell' ? `http://localhost:8080/sell/${id}` : `http://localhost:8080/buy/${id}`;
+        fetch(url,{
+            method:'POST',
+            headers:{
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+            body:JSON.stringify(sellBuy)
+        })
+            .then(res => {
+                if (res.status === 200 || res.status === 201) {
+                    return res.text();
+                } else {
+                    return res.text().then(text => Promise.reject(text));
+                }
+            })
+            .then(data=>{
+                console.log(data);
+                fetch(`http://localhost:8080/memberInfo/${id}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        setUserData(data);
+                        navigate(`/trading/${id}/?stockId=${stockId}`);
+                    });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error);
+            });
+    }
     // ApexCharts 옵션 설정
     const chartOptions = {
         series: [{
@@ -222,7 +272,7 @@ const Trading = () => {
                     </Col>
                 </Row>
                 <Row>
-                    <Col md={7}>
+                    <Col md={9}>
                         <Card className="mb-4 shadow-sm card-custom">
                             <Card.Title>
                                 <Card.Header>
@@ -251,9 +301,40 @@ const Trading = () => {
                         </Card>
                     </Col>
                     <Col md={3}>
-                        <Card className="mb-4 shadow-sm card-custom">
+                        <Card className="mb-4 shadow-sm card-custom">  {/* 둥근 모서리를 위해 Card로 감쌌습니다 */}
                             <Card.Header>
-                                <h3>주식 거래</h3>
+                                <h4>보유 잔고: {userData && userData.balance}</h4>
+                            </Card.Header>
+                        </Card>                        <Card className="mb-4 shadow-sm card-custom">
+                            <Card.Header>
+                                <h4 style={{ textAlign: 'center', margin: '10px'}}>주식 거래</h4>
+                                <Form>
+                                    주식 이름
+                                    <Form.Control
+                                        size="lg"
+                                        type="text"
+                                        placeholder="주식 이름을 입력해주세요"
+                                        name="stockName" // 추가
+                                        value={sellBuy.stockName}
+                                        onChange={handleChangeBuySell}
+                                        className="small-placeholder"
+                                    />
+                                    매도/매수 수량
+                                    <Form.Control
+                                        size="lg"
+                                        type="text"
+                                        placeholder="매도/매수 수량을 입력해주세요"
+                                        name="stockQuantity" // 추가
+                                        value={sellBuy.stockQuantity}
+                                        onChange={handleChangeBuySell}
+                                        className="small-placeholder"
+                                    />
+                                    <div className="button-group" style={{ margin: '10px' }}>
+                                        <Button variant="danger" className="trade-button" onClick={(e) => onSellBuySubmit(e, 'sell')}>매도</Button>
+                                        <Button variant="primary" className="trade-button" onClick={(e) => onSellBuySubmit(e, 'buy')}>매수</Button>
+                                    </div>
+                                </Form>
+
                             </Card.Header>
                         </Card>
                     </Col>

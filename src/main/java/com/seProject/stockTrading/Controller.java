@@ -6,6 +6,9 @@ import com.seProject.stockTrading.domain.member.Member;
 import com.seProject.stockTrading.domain.member.MemberDTO;
 import com.seProject.stockTrading.domain.member.MemberRepository;
 import com.seProject.stockTrading.domain.member.MemberService;
+import com.seProject.stockTrading.domain.member_stock.MemberStock;
+import com.seProject.stockTrading.domain.member_stock.MemberStockDTO;
+import com.seProject.stockTrading.domain.member_stock.MemberStockRepository;
 import com.seProject.stockTrading.domain.post.Post;
 import com.seProject.stockTrading.domain.post.PostRepository;
 import com.seProject.stockTrading.domain.post.PostService;
@@ -20,7 +23,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +34,7 @@ import java.util.Optional;
 @RestController
 public class Controller {
     private final HttpEncodingAutoConfiguration httpEncodingAutoConfiguration;
+    private final MemberStockRepository memberStockRepository;
     MemberRepository memberRepository;
     MemberService memberService;
     PostRepository postRepository;
@@ -44,7 +50,7 @@ public class Controller {
             MemberService memberService,
             CommentRepository commentRepository,
             StockRepository stockRepository,
-            StockPriceRepository stockPriceRepository, HttpEncodingAutoConfiguration httpEncodingAutoConfiguration){
+            StockPriceRepository stockPriceRepository, HttpEncodingAutoConfiguration httpEncodingAutoConfiguration, MemberStockRepository memberStockRepository){
         this.memberRepository = memberRepository;
         this.memberService = memberService;
         this.postRepository = postRepository;
@@ -53,6 +59,7 @@ public class Controller {
         this.stockRepository = stockRepository;
         this.stockPriceRepository = stockPriceRepository;
         this.httpEncodingAutoConfiguration = httpEncodingAutoConfiguration;
+        this.memberStockRepository = memberStockRepository;
     }
 
     // 모든 게시물을 list 형태로 가져오는 api
@@ -257,6 +264,42 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용가능한 닉네임입니다.");
         } else {
             return ResponseEntity.ok("중복된 닉네임입니다.");
+        }
+    }
+    //매수 api
+    @CrossOrigin
+    @PostMapping("/buy/{id}")
+    public ResponseEntity<?> buy(@PathVariable Long id,@RequestBody MemberStockDTO memberStockDTO) {
+        Optional<MemberStock> memberStock = memberStockRepository.findByMemberIdAndStockId(id,memberStockDTO.getStockId());
+        Optional<Stock> stock = stockRepository.findById(memberStockDTO.getStockId());
+        if(stock.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 주식 정보가 없습니다.");
+        }
+        Optional<Member> member = memberRepository.findById(id);
+        if(member.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 멤버 정보가 없습니다.");
+        }
+        Long currentBalance = member.get().getBalance();
+        Long totalCost = (long) (memberStockDTO.getStockQuantity() * stock.get().getCurrentPrice());
+        if (currentBalance < totalCost) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잔액이 부족합니다.");
+        }
+
+        member.get().setBalance(currentBalance - totalCost);
+        if(memberStock.isEmpty()) {
+            // 생성
+            MemberStock memberStockObj = new MemberStock();
+            memberStockObj.setQuantity(memberStockDTO.getStockQuantity());
+            memberStockObj.setCreatedAt(Timestamp.valueOf(LocalDateTime.now())); // 현재 시간 설정
+            memberStockObj.setMember(member.get());
+            memberStockObj.setStock(stock.get());
+            return new ResponseEntity<>(memberStockRepository.save(memberStockObj),HttpStatus.CREATED);
+        } else {
+            // 수정
+            Long tempQuantity = memberStock.get().getQuantity();
+            memberStock.get().setQuantity(memberStockDTO.getStockQuantity() + tempQuantity);
+            memberStock.get().setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+            return ResponseEntity.ok(memberStockRepository.save(memberStock.get()));
         }
     }
 }

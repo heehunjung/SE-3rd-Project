@@ -4,6 +4,7 @@ import com.seProject.stockTrading.domain.enums.MemberRole;
 import com.seProject.stockTrading.domain.post.Post;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ import static com.seProject.stockTrading.domain.enums.MemberRole.USER;
 
 @Entity
 @Getter
+@Setter
 public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +29,7 @@ public class Member {
     private Long number;
     //사용자 잔고
     @Column(nullable = false)
-    private int balance = 0;
+    private Long balance = 0L;
     //사용자 권한
     @Enumerated(EnumType.STRING)
     private MemberRole role = USER;
