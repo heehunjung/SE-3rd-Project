@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Nav, Container, Form, Button, Row, Col, Card, Badge } from 'react-bootstrap';
+import {Nav, Container, Form, Button, Row, Col, Card, Badge, InputGroup} from 'react-bootstrap';
 import Navbar from 'react-bootstrap/Navbar';
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import ReactApexChart from 'react-apexcharts';
@@ -83,29 +83,33 @@ const Trading = () => {
     const handleChange = (e) =>{
         setStockName(e.target.value);
     }
-    const handleSubmit =(e)=>{
+    const handleSubmit = (e) => {
         e.preventDefault();
-        if(!stockName){
+        if (!stockName) {
             alert('검색 내용을 가져오는 중입니다. 잠시만 기다려주세요.');
             return;
         }
-        fetch(`http://localhost:8080/stockData/name/${stockName}`,{
+        fetch(`http://localhost:8080/stockData/name/${stockName}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json; charset=utf-8',
             }
-    })
-            .then(res=>{
-                if(!res.ok) {
-                    throw new Error('Network response was not ok');
+        })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('주식 이름을 다시 입력해주세요.');
                 }
                 return res.json();
             })
-            .then(data=>{
+            .then(data => {
                 navigate(`/trading/${id}/?stockId=${data.id}`);
             })
-            .catch(error => setError(error.message));
+            .catch(error => {
+                alert(error.message); // 오류 메시지를 alert로 표시
+                console.log(error.message); // 오류 메시지를 콘솔에 출력
+            });
     }
+
     // ApexCharts 옵션 설정
     const chartOptions = {
         series: [{
@@ -202,14 +206,18 @@ const Trading = () => {
                 <Row>
                     <Col>
                         <div className="form-container">
-                            <Form.Control
-                                size="lg"
-                                type="text"
-                                placeholder="주식 이름"
-                                value={stockName}
-                                onChange={handleChange}
-                            />
-                            <Button className="btn-icon2" onClick={handleSubmit} type="submit">🔍</Button>
+                            <Form onSubmit={handleSubmit}> {/* 폼 제출 핸들러 설정 */}
+                                <InputGroup>
+                                    <Form.Control
+                                        size="lg"
+                                        type="text"
+                                        placeholder="주식 이름"
+                                        value={stockName}
+                                        onChange={handleChange}
+                                    />
+                                    <Button className="btn-icon2" type="submit">🔍</Button>
+                                </InputGroup>
+                            </Form>
                         </div>
                     </Col>
                 </Row>
@@ -218,7 +226,6 @@ const Trading = () => {
                         <Card className="mb-4 shadow-sm card-custom">
                             <Card.Title>
                                 <Card.Header>
-                                    {error && <p>오류: {error}</p>}
                                     {!stock && !error && <p>데이터를 불러오는 중...</p>}
                                     {stock && (
                                         <>
