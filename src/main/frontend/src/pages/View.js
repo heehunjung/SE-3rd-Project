@@ -93,16 +93,6 @@ const View = () => {
                 }
             })
             .then((data) => {
-                fetch(`http://localhost:8080/getComment/${id}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        setComments(data);
-                    })
                 console.log(data);
                 setNewComment("");
                 navigate(`/ViewPost/${id}?memberId=${memberId}`);
@@ -128,7 +118,7 @@ const View = () => {
                 console.error('Error fetching comments:', error);
                 setComments([]);
             });
-    }, [id],[comments]);
+    }, [id]);
 
     const handleEdit = () => {
         navigate(`/Post/${memberId}?postId=${id}`);
@@ -158,12 +148,12 @@ const View = () => {
 
     return (
         <>
-            <Navbar bg="dark" data-bs-theme="dark">
+            <Navbar bg="dark" variant="dark">
                 <Container>
                     {userData && userData.role === 'ADMIN' ? (
-                        <Navbar.Brand href={`/Home/${memberId}`}>KW 거래소📉 관리자 모드</Navbar.Brand>
+                        <Navbar.Brand href={`/Home/${id}`}>KW 거래소📉 관리자 모드</Navbar.Brand>
                     ) : (
-                        <Navbar.Brand href={`/Home/${memberId}`}>KW 거래소📉</Navbar.Brand>
+                        <Navbar.Brand href={`/Home/${id}`}>KW 거래소📉</Navbar.Brand>
                     )}
                     <Nav className="ml-auto">
                         <Nav.Link href={`/Home/${memberId}`}>홈 화면</Nav.Link>
@@ -185,7 +175,7 @@ const View = () => {
                 ) : error ? (
                     <div className="alert alert-danger">{error}</div>
                 ) : (
-                    <Card className="mb-4 shadow-sm card-custom wide-card">
+                    <Card className="mb-4 shadow-sm card-custom">
                         <Card.Header>
                             <div className="d-flex justify-content-between align-items-center">
                                 <div>
@@ -195,15 +185,15 @@ const View = () => {
                                     </span>
                                 </div>
                                 <div>
+                                    {(userData && userData.role === 'ADMIN') || (boardData.member.id === parseInt(memberId)) ? (
+                                        <Button className="btn-icon" onClick={handleDelete}>
+                                            ❌
+                                        </Button>
+                                    ) : null}
                                     {boardData.member.id === parseInt(memberId) && (
-                                        <>
-                                            <Button className="btn-icon" onClick={handleEdit}>
-                                                ✏️
-                                            </Button>
-                                            <Button className="btn-icon" onClick={handleDelete}>
-                                                ❌
-                                            </Button>
-                                        </>
+                                        <Button className="btn-icon" onClick={handleEdit}>
+                                            ✏️
+                                        </Button>
                                     )}
                                 </div>
                             </div>
@@ -229,7 +219,7 @@ const View = () => {
                             <Button type="submit" variant="primary">선플 달기</Button>
                         </Form>
                         <div className="scrollable-card">
-                            {comments.map((comment, index) => (
+                            {comments && comments.map((comment, index) => (
                                 <div key={index}>
                                     <strong>🙋{comment.nickname}</strong> <span
                                     style={{fontSize: '0.8em', color: 'gray', marginLeft: '10px'}}>
