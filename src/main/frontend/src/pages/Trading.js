@@ -213,7 +213,42 @@ const Trading = () => {
     };
     // 버튼 클릭 시 상태를 변경하는 함수
     const handleClick = () => {
-        setIsFilled(!isFilled); // 현재 상태의 반대값으로 변경
+        setIsFilled(!isFilled);
+        let like;
+
+        if (!isFilled) {
+            like = {
+                like: 1,
+                stockId: stockId
+            };
+        } else {
+            like = {
+                like: 0,
+                stockId: stockId
+            };
+        }
+
+        fetch(`http://localhost:8080/interestedStock/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+            body: JSON.stringify(like),
+        })
+            .then((res) => {
+                if (res.status === 200) {
+                    return res.text();
+                } else {
+                    return res.text().then(text => Promise.reject(text));
+                }
+            })
+            .then(() => {
+                fetchMemberStockData();
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert(error);
+            });
     };
 
     const chartOptions = {

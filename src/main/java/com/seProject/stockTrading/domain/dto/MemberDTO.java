@@ -1,4 +1,4 @@
-package com.seProject.stockTrading.domain.member;
+package com.seProject.stockTrading.domain.dto;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -2,12 +2,13 @@ package com.seProject.stockTrading;
 
 import com.seProject.stockTrading.domain.commets.Comment;
 import com.seProject.stockTrading.domain.commets.CommentRepository;
+import com.seProject.stockTrading.domain.dto.StockLikeDTO;
 import com.seProject.stockTrading.domain.member.Member;
-import com.seProject.stockTrading.domain.member.MemberDTO;
+import com.seProject.stockTrading.domain.dto.MemberDTO;
 import com.seProject.stockTrading.domain.member.MemberRepository;
 import com.seProject.stockTrading.domain.member.MemberService;
 import com.seProject.stockTrading.domain.member_stock.MemberStock;
-import com.seProject.stockTrading.domain.member_stock.MemberStockDTO;
+import com.seProject.stockTrading.domain.dto.MemberStockDTO;
 import com.seProject.stockTrading.domain.member_stock.MemberStockRepository;
 import com.seProject.stockTrading.domain.post.Post;
 import com.seProject.stockTrading.domain.post.PostRepository;
@@ -353,5 +354,44 @@ public class Controller {
         memberStock.get().setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
         memberStockRepository.save(memberStock.get());
         return ResponseEntity.ok("매도에 성공하였습니다.");
+    }
+    //관심종목 api
+    @CrossOrigin
+    @PostMapping("/interestedStock/{id}")
+    public ResponseEntity<?> interestedStock(@PathVariable Long id, @RequestBody StockLikeDTO stockLikeDTO) {
+        Optional<MemberStock> memberStockOpt = memberStockRepository.findByStockId(stockLikeDTO.getStockId());
+        Optional<Stock> stock = stockRepository.findById(stockLikeDTO.getStockId());
+        if(stock.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 주식 정보가 없습니다.");
+        }
+        Optional<Member> member = memberRepository.findById(id);
+        if(member.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 멤버 정보가 없습니다.");
+        }
+        if(memberStockOpt.isPresent()) {
+            if(stockLikeDTO.getLike()==0){
+                memberStockOpt.get().setIsPreferred(0);
+            } else {
+                memberStockOpt.get().setIsPreferred(1);
+            }
+            memberStockOpt.get().setStock(stock.get());
+            memberStockOpt.get().setMember(member.get());
+            memberStockOpt.get().setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+            memberStockRepository.save(memberStockOpt.get());
+            return ResponseEntity.ok("관심 종목 등록에 성공하였습니다.");
+        } else {
+            MemberStock memberStockObj = new MemberStock();
+            if(stockLikeDTO.getLike()==0){
+                memberStockObj.setIsPreferred(0);
+            } else {
+                memberStockObj.setIsPreferred(1);
+            }
+            memberStockObj.setStock(stock.get());
+            memberStockObj.setMember(member.get());
+            memberStockObj.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+            memberStockRepository.save(memberStockObj);
+            return ResponseEntity.ok("관심 종목 등록에 성공하였습니다.");
+        }
+
     }
 }

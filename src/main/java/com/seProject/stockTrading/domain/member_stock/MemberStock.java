@@ -18,7 +18,7 @@ public class MemberStock {
     // 선호 종목
     private int isPreferred=0;
     // 구매 수량
-    private Long quantity;
+    private Long quantity= 0L;
     // 구매 일자
     private Timestamp createdAt;
     @ManyToOne

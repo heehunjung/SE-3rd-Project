@@ -1,4 +1,4 @@
-package com.seProject.stockTrading.domain.post;
+package com.seProject.stockTrading.domain.dto;
 
 import lombok.Getter;
 
