@@ -17,6 +17,8 @@ import com.seProject.stockTrading.domain.stock.Stock;
 import com.seProject.stockTrading.domain.stock.StockRepository;
 import com.seProject.stockTrading.domain.stockPrice.StockPrice;
 import com.seProject.stockTrading.domain.stockPrice.StockPriceRepository;
+import com.seProject.stockTrading.domain.trade.TradeRecord;
+import com.seProject.stockTrading.domain.trade.TradeRecordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.servlet.HttpEncodingAutoConfiguration;
@@ -36,6 +38,7 @@ import java.util.Optional;
 public class Controller {
     private final HttpEncodingAutoConfiguration httpEncodingAutoConfiguration;
     private final MemberStockRepository memberStockRepository;
+    private final TradeRecordRepository tradeRecordRepository;
     MemberRepository memberRepository;
     MemberService memberService;
     PostRepository postRepository;
@@ -51,7 +54,9 @@ public class Controller {
             MemberService memberService,
             CommentRepository commentRepository,
             StockRepository stockRepository,
-            StockPriceRepository stockPriceRepository, HttpEncodingAutoConfiguration httpEncodingAutoConfiguration, MemberStockRepository memberStockRepository){
+            StockPriceRepository stockPriceRepository,
+            HttpEncodingAutoConfiguration httpEncodingAutoConfiguration, MemberStockRepository memberStockRepository,
+            TradeRecordRepository tradeRecordRepository){
         this.memberRepository = memberRepository;
         this.memberService = memberService;
         this.postRepository = postRepository;
@@ -61,6 +66,7 @@ public class Controller {
         this.stockPriceRepository = stockPriceRepository;
         this.httpEncodingAutoConfiguration = httpEncodingAutoConfiguration;
         this.memberStockRepository = memberStockRepository;
+        this.tradeRecordRepository = tradeRecordRepository;
     }
 
     // 모든 게시물을 list 형태로 가져오는 api
@@ -278,17 +284,17 @@ public class Controller {
             return ResponseEntity.ok("중복된 닉네임입니다.");
         }
     }
-    //매수 api
+    // 매수 API
     @CrossOrigin
     @PostMapping("/buy/{id}")
-    public ResponseEntity<?> buy(@PathVariable Long id,@RequestBody MemberStockDTO memberStockDTO) {
-        Optional<MemberStock> memberStock = memberStockRepository.findByMemberIdAndStockId(id,memberStockDTO.getStockId());
+    public ResponseEntity<?> buy(@PathVariable Long id, @RequestBody MemberStockDTO memberStockDTO) {
+        Optional<MemberStock> memberStock = memberStockRepository.findByMemberIdAndStockId(id, memberStockDTO.getStockId());
         Optional<Stock> stock = stockRepository.findById(memberStockDTO.getStockId());
-        if(stock.isEmpty()) {
+        if (stock.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 주식 정보가 없습니다.");
         }
         Optional<Member> member = memberRepository.findById(id);
-        if(member.isEmpty()) {
+        if (member.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 멤버 정보가 없습니다.");
         }
         Long currentBalance = member.get().getBalance();
@@ -298,7 +304,7 @@ public class Controller {
         }
 
         member.get().setBalance(currentBalance - totalCost);
-        if(memberStock.isEmpty()) {
+        if (memberStock.isEmpty()) {
             // 생성
             MemberStock memberStockObj = new MemberStock();
             memberStockObj.setQuantity(memberStockDTO.getStockQuantity());
@@ -307,7 +313,6 @@ public class Controller {
             memberStockObj.setStock(stock.get());
             memberStockObj.setStockName(stock.get().getStockName());
             memberStockRepository.save(memberStockObj);
-            return new ResponseEntity<>("매수에 성공하였습니다.",HttpStatus.CREATED);
         } else {
             // 수정
             Long tempQuantity = memberStock.get().getQuantity();
@@ -315,8 +320,19 @@ public class Controller {
             memberStock.get().setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
             memberStock.get().setStockName(stock.get().getStockName());
             memberStockRepository.save(memberStock.get());
-            return ResponseEntity.ok("매수에 성공하였습니다.");
         }
+
+        // 거래 기록 추가
+        TradeRecord tradeRecord = new TradeRecord();
+        tradeRecord.setMember(member.get());
+        tradeRecord.setStock(stock.get());
+        tradeRecord.setQuantity(Math.toIntExact(memberStockDTO.getStockQuantity()));
+        tradeRecord.setPrice(stock.get().getCurrentPrice());
+        tradeRecord.setType("BUY");
+        tradeRecord.setTimestamp(Timestamp.valueOf(LocalDateTime.now()));
+        tradeRecordRepository.save(tradeRecord);
+
+        return new ResponseEntity<>("매수에 성공하였습니다.", HttpStatus.CREATED);
     }
     //매도 api
     @CrossOrigin
@@ -346,7 +362,18 @@ public class Controller {
         memberStock.get().setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
         memberStock.get().setStockName(stock.get().getStockName());
         memberStockRepository.save(memberStock.get());
+
+        //거래 기록 추가
+        TradeRecord tradeRecord = new TradeRecord();
+        tradeRecord.setMember(member.get());
+        tradeRecord.setStock(stock.get());
+        tradeRecord.setQuantity(Math.toIntExact(memberStockDTO.getStockQuantity()));
+        tradeRecord.setPrice(stock.get().getCurrentPrice());
+        tradeRecord.setType("SELL");
+        tradeRecord.setTimestamp(Timestamp.valueOf(LocalDateTime.now()));
+        tradeRecordRepository.save(tradeRecord);
         return ResponseEntity.ok("매도에 성공하였습니다.");
+
     }
     //관심종목 api
     @CrossOrigin
@@ -420,4 +447,15 @@ public class Controller {
             return ResponseEntity.ok(memberStockOpt.get());
         }
     }
+    //거래 기록을 가져오는 API
+    @CrossOrigin
+    @GetMapping("/tradeRecords/{memberId}")
+    public ResponseEntity<?> getTradeRecords(@PathVariable Long memberId) {
+        List<TradeRecord> tradeRecords = tradeRecordRepository.findByMemberId(memberId);
+        if (tradeRecords.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("거래 기록이 없습니다.");
+        }
+        return ResponseEntity.ok(tradeRecords);
+    }
+
 }
