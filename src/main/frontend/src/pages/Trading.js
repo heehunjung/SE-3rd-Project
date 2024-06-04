@@ -23,6 +23,9 @@ const Trading = () => {
     const [sellBuy, setSellBuy] = useState({ stockName: '', stockQuantity: '', stockId: stockId });
     const [totalAmount, setTotalAmount] = useState(null);
     const [memberStock, setMemberStock] = useState(null);
+    const [isFilled, setIsFilled] = useState(false);
+
+    const heartSymbol = isFilled ? '❤️' : '🤍';
 
     useEffect(() => {
         fetchStockData();
@@ -208,6 +211,10 @@ const Trading = () => {
             alert(error.message);
         }
     };
+    // 버튼 클릭 시 상태를 변경하는 함수
+    const handleClick = () => {
+        setIsFilled(!isFilled); // 현재 상태의 반대값으로 변경
+    };
 
     const chartOptions = {
         series: [{ name: '종가', data: stockPrice }],
@@ -280,13 +287,21 @@ const Trading = () => {
                                     {stock && (
                                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                             <div>
-                                                <h3><strong>{stock.stockName}</strong></h3>
+                                                <div style={{display: 'flex', alignItems: 'center'}}>
+                                                    <h3 style={{marginRight: '10px'}}><strong>{stock.stockName}</strong>
+                                                    </h3>
+                                                    <button onClick={handleClick} className="btn-icon3">
+                                                        {heartSymbol}
+                                                    </button>
+                                                </div>
                                                 <strong>{stock.currentPrice?.toLocaleString() ?? 'N/A'}원</strong>
-                                                <Badge bg={change > 0 ? 'danger' : 'primary'} style={{ marginLeft: '10px' }}>
+                                                <Badge bg={change > 0 ? 'danger' : 'primary'}
+                                                       style={{marginLeft: '10px'}}>
                                                     {change !== null ? (change > 0 ? '📈' : '📉') + (change * 100).toFixed(2) : 'N/A'}%
                                                 </Badge>
+
                                             </div>
-                                            <div style={{ textAlign: 'left', fontSize: '0.8em' }}>
+                                            <div style={{textAlign: 'left', fontSize: '0.8em'}}>
                                                 <strong>
                                                     <div>상한가 {stockYesterday?.highPrice?.toLocaleString() ?? 'N/A'}원</div>
                                                     <div>하한가 {stockYesterday?.lowPrice?.toLocaleString() ?? 'N/A'}원</div>
@@ -367,9 +382,9 @@ const Trading = () => {
                                 {isLoading ? (
                                     <p>데이터를 불러오는 중...</p>
                                 ) : memberStock && memberStock.length > 0 ? (
-                                    <ul style={{ listStyleType: 'none', padding: 0 }}>
+                                    <ul className="scrollable-card4" style={{ listStyleType: 'none', padding: 0 }}>
                                         {memberStock.map((stock, index) => (
-                                            <li key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                                            <li key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' ,marginLeft:'5px' }}>
                                                 <div style={{ flex: 1, textAlign: 'left' }}>{stock.stockName}</div>
                                                 <div style={{ flex: 1, textAlign: 'left' }}>{stock.quantity}주</div>
                                                 <div style={{ flex: 1, textAlign: 'left' }}>{stock.currentPrice?.toLocaleString() ?? 'N/A'}원</div>

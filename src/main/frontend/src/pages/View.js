@@ -93,6 +93,16 @@ const View = () => {
                 }
             })
             .then((data) => {
+                fetch(`http://localhost:8080/getComment/${id}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        setComments(data);
+                    })
                 console.log(data);
                 setNewComment("");
                 navigate(`/ViewPost/${id}?memberId=${memberId}`);
@@ -148,12 +158,12 @@ const View = () => {
 
     return (
         <>
-            <Navbar bg="dark" variant="dark">
+            <Navbar bg="dark" data-bs-theme="dark">
                 <Container>
                     {userData && userData.role === 'ADMIN' ? (
-                        <Navbar.Brand href={`/Home/${id}`}>KW 거래소📉 관리자 모드</Navbar.Brand>
+                        <Navbar.Brand href={`/Home/${memberId}`}>KW 거래소📉 관리자 모드</Navbar.Brand>
                     ) : (
-                        <Navbar.Brand href={`/Home/${id}`}>KW 거래소📉</Navbar.Brand>
+                        <Navbar.Brand href={`/Home/${memberId}`}>KW 거래소📉</Navbar.Brand>
                     )}
                     <Nav className="ml-auto">
                         <Nav.Link href={`/Home/${memberId}`}>홈 화면</Nav.Link>
@@ -175,7 +185,7 @@ const View = () => {
                 ) : error ? (
                     <div className="alert alert-danger">{error}</div>
                 ) : (
-                    <Card className="mb-4 shadow-sm card-custom">
+                    <Card className="mb-4 shadow-sm card-custom wide-card">
                         <Card.Header>
                             <div className="d-flex justify-content-between align-items-center">
                                 <div>
