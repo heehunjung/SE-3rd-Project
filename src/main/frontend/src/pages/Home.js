@@ -14,7 +14,7 @@ const Home = () => {
     const [stockData, setStockData] = useState([]);
     const [topGainers, setTopGainers] = useState([]);
     const [topLosers, setTopLosers] = useState([]);
-
+    const [likeStocks, setLikeStocks] = useState(null);
     useEffect(() => {
         fetch(`http://localhost:8080/stockData`)
             .then(response => {
@@ -29,6 +29,20 @@ const Home = () => {
             })
             .catch(error => setError(error.message));
     }, []);
+    // 관심 종목 요청을 위한 api 호출
+    useEffect(()=>{
+        fetch(`http://localhost:8080/interestedStock/${id}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                setLikeStocks(data); // 전체 주식 데이터 설정
+            })
+            .catch(error => setError(error.message));
+    }, [id]);
 
     useEffect(() => {
         fetch(`http://localhost:8080/memberInfo/${id}`)
@@ -139,14 +153,19 @@ const Home = () => {
                         <Card>
                             <Card.Header>내 관심종목</Card.Header>
                             <Card.Body className="scrollable-card">
-                                <p>
-                                    {' '}
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer
-                                    posuere erat a ante.{' '}
-                                </p>
-                                <footer className="blockquote-footer">
-                                    Someone famous in <cite title="Source Title">Source Title</cite>
-                                </footer>
+                                {likeStocks && likeStocks.length>0 ? (
+                                    likeStocks.map(stock=>(
+                                        <p key={stock.id}>
+                                            <Link to={`/Trading/${id}?stockId=${stock.id}`} style={{ color: 'white', textDecoration: 'none', fontSize: '1.1em', fontWeight: 'bold' }}>
+                                                {stock.stockName}
+                                            </Link>
+                                        </p>
+                                    ))
+                                ) : error ? (
+                                    <p>오류: {error}</p>
+                                ) : (
+                                    <p>데이터를 불러오는 중...</p>
+                                )}
                             </Card.Body>
                         </Card>
                     </Col>

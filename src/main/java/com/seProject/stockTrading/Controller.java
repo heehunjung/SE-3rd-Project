@@ -73,16 +73,6 @@ public class Controller {
         }
         return ResponseEntity.ok(postInfo);
     }
-    // memberStock List 가져오는 api
-    @CrossOrigin
-    @GetMapping("/memberStock/{id}")
-    public ResponseEntity<?> getMemberStocks(@PathVariable Long id) {
-        List<MemberStock> memberStocks=memberStockRepository.findAllByMemberId(id);
-        if (memberStocks.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 정보가 없습니다.");
-        }
-        return ResponseEntity.ok(memberStocks);
-    }
     // 특정 게시물을 가져오는 api
     @CrossOrigin
     @GetMapping("/board/{id}")
@@ -315,6 +305,7 @@ public class Controller {
             memberStockObj.setCreatedAt(Timestamp.valueOf(LocalDateTime.now())); // 현재 시간 설정
             memberStockObj.setMember(member.get());
             memberStockObj.setStock(stock.get());
+            memberStockObj.setStockName(stock.get().getStockName());
             memberStockRepository.save(memberStockObj);
             return new ResponseEntity<>("매수에 성공하였습니다.",HttpStatus.CREATED);
         } else {
@@ -322,6 +313,7 @@ public class Controller {
             Long tempQuantity = memberStock.get().getQuantity();
             memberStock.get().setQuantity(memberStockDTO.getStockQuantity() + tempQuantity);
             memberStock.get().setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+            memberStock.get().setStockName(stock.get().getStockName());
             memberStockRepository.save(memberStock.get());
             return ResponseEntity.ok("매수에 성공하였습니다.");
         }
@@ -352,6 +344,7 @@ public class Controller {
         member.get().setBalance(currentBalance + totalCost);
         memberStock.get().setQuantity(currentQuantity-memberStockDTO.getStockQuantity());
         memberStock.get().setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+        memberStock.get().setStockName(stock.get().getStockName());
         memberStockRepository.save(memberStock.get());
         return ResponseEntity.ok("매도에 성공하였습니다.");
     }
@@ -377,6 +370,7 @@ public class Controller {
             memberStockOpt.get().setStock(stock.get());
             memberStockOpt.get().setMember(member.get());
             memberStockOpt.get().setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+            memberStockOpt.get().setStockName(stock.get().getStockName());
             memberStockRepository.save(memberStockOpt.get());
             return ResponseEntity.ok("관심 종목 등록에 성공하였습니다.");
         } else {
@@ -389,9 +383,41 @@ public class Controller {
             memberStockObj.setStock(stock.get());
             memberStockObj.setMember(member.get());
             memberStockObj.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+            memberStockObj.setStockName(stock.get().getStockName());
             memberStockRepository.save(memberStockObj);
             return ResponseEntity.ok("관심 종목 등록에 성공하였습니다.");
         }
 
+    }
+    //관심 종목을 LIST 형태로 제공하는 api
+    @CrossOrigin
+    @GetMapping("interestedStock/{id}")
+    public ResponseEntity<?> interestedStock(@PathVariable Long id) {
+        List<MemberStock> memberStockOpt = memberStockRepository.findByIsPreferredAndMemberId(1,id);
+        if(memberStockOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("선호 종목이 없습니다.");
+        }
+        return ResponseEntity.ok(memberStockOpt);
+    }
+    // memberStock List 가져오는 api
+    @CrossOrigin
+    @GetMapping("/memberStock/{id}")
+    public ResponseEntity<?> getMemberStocks(@PathVariable Long id) {
+        List<MemberStock> memberStocks=memberStockRepository.findAllByMemberId(id);
+        if (memberStocks.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 정보가 없습니다.");
+        }
+        return ResponseEntity.ok(memberStocks);
+    }
+    // memberStock 객체를 가져오는 api by stockId
+    @CrossOrigin
+    @GetMapping("/memberStock/stockId/{id}")
+    public ResponseEntity<?> getMemberStocksByStockId(@PathVariable Long id) {
+        Optional<MemberStock> memberStockOpt = memberStockRepository.findByStockId(id);
+        if(memberStockOpt.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else{
+            return ResponseEntity.ok(memberStockOpt.get());
+        }
     }
 }

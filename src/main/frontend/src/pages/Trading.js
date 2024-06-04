@@ -24,7 +24,7 @@ const Trading = () => {
     const [totalAmount, setTotalAmount] = useState(null);
     const [memberStock, setMemberStock] = useState(null);
     const [isFilled, setIsFilled] = useState(false);
-
+    const [likeCheck,setLikeCheck] = useState(null);
     const heartSymbol = isFilled ? '❤️' : '🤍';
 
     useEffect(() => {
@@ -32,6 +32,8 @@ const Trading = () => {
         fetchStockPrice();
         fetchMemberInfo();
         fetchMemberStockData();
+        fetchLikeCheck();
+
     }, [stockId, id]);
 
     useEffect(() => {
@@ -50,7 +52,25 @@ const Trading = () => {
                 alert(error.message);
             });
     }, [stockId]);
-
+    // 관심 종목 체크를 가져오는 함수
+    const fetchLikeCheck = () => {
+        fetch(`http://localhost:8080/memberStock/stockId/${stockId}`)
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return res.json();
+            })
+            .then(data => {
+                setLikeCheck(data);
+                setIsFilled(data.isPreferred === 1); // isPreferred 값에 따라 isFilled 설정
+            })
+            .catch(error => {
+                console.log('오류가 발생했습니다.', error);
+                setError(error.message);
+            });
+    };
+    // 주식 데이터를 가져오는 함수
     const fetchStockData = async () => {
         try {
             const res = await fetch(`http://localhost:8080/stockData/${stockId}`);
@@ -63,7 +83,7 @@ const Trading = () => {
             alert(error.message);
         }
     };
-
+    // 주식 가격 데이터를 가져오는 함수
     const fetchStockPrice = async () => {
         try {
             const res = await fetch(`http://localhost:8080/stockPrice/${stockId}`);
@@ -76,18 +96,21 @@ const Trading = () => {
         }
     };
 
+    // 회원 정보를 가져오는 함수
     const fetchMemberInfo = async () => {
         try {
             const res = await fetch(`http://localhost:8080/memberInfo/${id}`);
             if (!res.ok) throw new Error(await res.text());
             const data = await res.json();
             setUserData(data);
+            setIsFilled(data.isPreferred === 1); // isPreferred 값에 따라 isFilled 설정
         } catch (error) {
             setError(error.message);
             alert(error.message);
         }
     };
 
+    // 회원 주식 데이터를 가져오는 함수
     const fetchMemberStockData = async () => {
         try {
             const res = await fetch(`http://localhost:8080/memberStock/${id}`);
@@ -100,6 +123,7 @@ const Trading = () => {
         }
     };
 
+    // 주식 정보를 가져오는 함수
     const fetchStockInfo = async (memberStockList) => {
         try {
             setIsLoading(true);
@@ -126,6 +150,7 @@ const Trading = () => {
         }
     };
 
+    // 주식 상승률 및 하락률을 가져오는 함수
     const fetchUpAndDown = async (stockId) => {
         try {
             const res = await fetch(`http://localhost:8080/changes/${stockId}`);
@@ -138,10 +163,12 @@ const Trading = () => {
         }
     };
 
+    // 주식 이름을 변경하는 함수
     const handleChange = (e) => {
         setStockName(e.target.value);
     };
 
+    // 매도/매수 수량을 변경하는 함수
     const handleChangeBuySell = (e) => {
         if (!stock) {
             alert('주식 정보를 가져오고 있습니다. 잠시만 기다려주세요.');
@@ -158,6 +185,7 @@ const Trading = () => {
         }
     };
 
+    // 주식 이름으로 주식을 검색하는 함수
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!stockName) {
@@ -174,6 +202,7 @@ const Trading = () => {
         }
     };
 
+    // 매도/매수 요청을 처리하는 함수
     const onSellBuySubmit = async (e, action) => {
         e.preventDefault();
         if (!sellBuy) {
@@ -211,7 +240,8 @@ const Trading = () => {
             alert(error.message);
         }
     };
-    // 버튼 클릭 시 상태를 변경하는 함수
+
+    // 관심 종목 추가/제거를 처리하는 함수
     const handleClick = () => {
         setIsFilled(!isFilled);
         let like;
@@ -418,13 +448,15 @@ const Trading = () => {
                                     <p>데이터를 불러오는 중...</p>
                                 ) : memberStock && memberStock.length > 0 ? (
                                     <ul className="scrollable-card4" style={{ listStyleType: 'none', padding: 0 }}>
-                                        {memberStock.map((stock, index) => (
-                                            <li key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' ,marginLeft:'5px' }}>
-                                                <div style={{ flex: 1, textAlign: 'left' }}>{stock.stockName}</div>
-                                                <div style={{ flex: 1, textAlign: 'left' }}>{stock.quantity}주</div>
-                                                <div style={{ flex: 1, textAlign: 'left' }}>{stock.currentPrice?.toLocaleString() ?? 'N/A'}원</div>
-                                            </li>
-                                        ))}
+                                        {memberStock
+                                            .filter(stock => stock.quantity > 0) // quantity가 0보다 큰 항목만 필터링
+                                            .map((stock, index) => (
+                                                <li key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' ,marginLeft:'5px' }}>
+                                                    <div style={{ flex: 1, textAlign: 'left' }}>{stock.stockName}</div>
+                                                    <div style={{ flex: 1, textAlign: 'left' }}>{stock.quantity}주</div>
+                                                    <div style={{ flex: 1, textAlign: 'left' }}>{stock.currentPrice?.toLocaleString() ?? 'N/A'}원</div>
+                                                </li>
+                                            ))}
                                     </ul>
                                 ) : (
                                     <p>보유한 주식이 없습니다.</p>

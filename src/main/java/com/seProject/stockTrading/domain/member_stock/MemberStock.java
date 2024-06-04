@@ -20,11 +20,12 @@ public class MemberStock {
     // 구매 수량
     private Long quantity= 0L;
     // 구매 일자
+    // 종목 이름
+    private String stockName;
     private Timestamp createdAt;
     @ManyToOne
     @JoinColumn(name = "member_id",nullable = false)
     private Member member;
-
     @ManyToOne
     @JoinColumn(name = "stock_id", nullable = false)
     private Stock stock;
