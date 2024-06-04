@@ -324,9 +324,32 @@ public class Controller {
         }
     }
     //매도 api
-   /* @CrossOrigin
+    @CrossOrigin
     @PostMapping("/sell/{id}")
     public ResponseEntity<?> sell(@PathVariable Long id,@RequestBody MemberStockDTO memberStockDTO) {
         Optional<MemberStock> memberStock = memberStockRepository.findById(memberStockDTO.getStockId());
-    }*/
+        if(memberStock.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("해당 주식을 보유하고 있지 않습니다.");
+        }
+        Optional<Stock> stock = stockRepository.findById(memberStockDTO.getStockId());
+        if(stock.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 주식 정보가 없습니다.");
+        }
+        Optional<Member> member = memberRepository.findById(id);
+        if(member.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 멤버 정보가 없습니다.");
+        }
+        Long currentQuantity = memberStock.get().getQuantity();
+        if (currentQuantity < memberStockDTO.getStockQuantity()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("보유 주식보다 큰 수량입니다.");
+        }
+
+        Long currentBalance = member.get().getBalance();
+        Long totalCost = (long) (memberStockDTO.getStockQuantity() * stock.get().getCurrentPrice());
+        member.get().setBalance(currentBalance + totalCost);
+
+        memberStock.get().setQuantity(currentQuantity-memberStockDTO.getStockQuantity());
+        memberStock.get().setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+        return ResponseEntity.ok(memberStockRepository.save(memberStock.get()));
+    }
 }
