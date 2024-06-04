@@ -314,20 +314,22 @@ public class Controller {
             memberStockObj.setCreatedAt(Timestamp.valueOf(LocalDateTime.now())); // 현재 시간 설정
             memberStockObj.setMember(member.get());
             memberStockObj.setStock(stock.get());
-            return new ResponseEntity<>(memberStockRepository.save(memberStockObj),HttpStatus.CREATED);
+            memberStockRepository.save(memberStockObj);
+            return new ResponseEntity<>("매수에 성공하였습니다.",HttpStatus.CREATED);
         } else {
             // 수정
             Long tempQuantity = memberStock.get().getQuantity();
             memberStock.get().setQuantity(memberStockDTO.getStockQuantity() + tempQuantity);
             memberStock.get().setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
-            return ResponseEntity.ok(memberStockRepository.save(memberStock.get()));
+            memberStockRepository.save(memberStock.get());
+            return ResponseEntity.ok("매수에 성공하였습니다.");
         }
     }
     //매도 api
     @CrossOrigin
     @PostMapping("/sell/{id}")
     public ResponseEntity<?> sell(@PathVariable Long id,@RequestBody MemberStockDTO memberStockDTO) {
-        Optional<MemberStock> memberStock = memberStockRepository.findById(memberStockDTO.getStockId());
+        Optional<MemberStock> memberStock = memberStockRepository.findByStockId(memberStockDTO.getStockId());
         if(memberStock.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("해당 주식을 보유하고 있지 않습니다.");
         }
@@ -347,9 +349,9 @@ public class Controller {
         Long currentBalance = member.get().getBalance();
         Long totalCost = (long) (memberStockDTO.getStockQuantity() * stock.get().getCurrentPrice());
         member.get().setBalance(currentBalance + totalCost);
-
         memberStock.get().setQuantity(currentQuantity-memberStockDTO.getStockQuantity());
         memberStock.get().setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
-        return ResponseEntity.ok(memberStockRepository.save(memberStock.get()));
+        memberStockRepository.save(memberStock.get());
+        return ResponseEntity.ok("매도에 성공하였습니다.");
     }
 }

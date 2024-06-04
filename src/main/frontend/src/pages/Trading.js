@@ -186,8 +186,7 @@ const Trading = () => {
             });
             if (res.status !== 200 && res.status !== 201) throw new Error(await res.text());
             const data = await res.text();
-            console.log(data);
-
+            alert(data);
             const updatedMemberStock = [...memberStock];
             const existingStock = updatedMemberStock.find(s => s.stock.id === stockId);
             if (existingStock) {
@@ -202,9 +201,8 @@ const Trading = () => {
                 });
             }
             setMemberStock(updatedMemberStock);
-
-            fetchMemberInfo();
-            fetchMemberStockData();
+            await fetchMemberInfo();
+            await fetchMemberStockData();
         } catch (error) {
             console.error('Error:', error);
             alert(error.message);
