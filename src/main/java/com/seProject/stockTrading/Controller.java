@@ -72,6 +72,16 @@ public class Controller {
         }
         return ResponseEntity.ok(postInfo);
     }
+    // memberStock List 가져오는 api
+    @CrossOrigin
+    @GetMapping("/memberStock/{id}")
+    public ResponseEntity<?> getMemberStocks(@PathVariable Long id) {
+        List<MemberStock> memberStocks=memberStockRepository.findAllByMemberId(id);
+        if (memberStocks.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 정보가 없습니다.");
+        }
+        return ResponseEntity.ok(memberStocks);
+    }
     // 특정 게시물을 가져오는 api
     @CrossOrigin
     @GetMapping("/board/{id}")
@@ -91,6 +101,17 @@ public class Controller {
             return ResponseEntity.ok(memberInfoOptional.get());
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 멤버의 데이터가 존재하지 않아요.");
+        }
+    }
+    //stock_price 를 stock_id로 가져오는 api
+    @CrossOrigin
+    @GetMapping("/stockData/yesterDay/{stockId}")
+    public ResponseEntity<?> getStockPriceToday(@PathVariable Long stockId){
+        Optional<StockPrice> stockPrice = stockPriceRepository.findTop1ByStockIdOrderByDateDesc(stockId);
+        if (stockPrice.isPresent()) {
+            return ResponseEntity.ok(stockPrice.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 주식 데이터가 존재하지 않아요.");
         }
     }
     // 해당 게시글의 댓글을 리스트 형태로 가져오는 api
@@ -302,4 +323,10 @@ public class Controller {
             return ResponseEntity.ok(memberStockRepository.save(memberStock.get()));
         }
     }
+    //매도 api
+   /* @CrossOrigin
+    @PostMapping("/sell/{id}")
+    public ResponseEntity<?> sell(@PathVariable Long id,@RequestBody MemberStockDTO memberStockDTO) {
+        Optional<MemberStock> memberStock = memberStockRepository.findById(memberStockDTO.getStockId());
+    }*/
 }
