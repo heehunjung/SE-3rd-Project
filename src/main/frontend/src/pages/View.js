@@ -66,41 +66,41 @@ const View = () => {
             });
     }, [id]);
 
-    const handleCommentSubmit = (e) => {
+    const handleCommentSubmit = async (e) => {
         e.preventDefault();
         if (!userData) {
             alert('유저 정보를 가져오는 중입니다. 잠시만 기다려주세요.');
             return;
         }
+
         const postData = {
             postId: id,
             nickname: userData.nickname,
             createdAt: new Date().toISOString(),
             content: newComment,
         };
-        fetch(`http://localhost:8080/postComment`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(postData),
-        })
-            .then((response) => {
-                if (response.status === 201 || response.status === 200) {
-                    return response.text();
-                } else {
-                    return response.text().then(text => Promise.reject(text || '댓글 업로드에 실패하였습니다.'));
-                }
-            })
-            .then((data) => {
-                console.log(data);
-                setNewComment("");
-                navigate(`/ViewPost/${id}?memberId=${memberId}`);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                alert(error);
+
+        try {
+            const response = await fetch(`http://localhost:8080/postComment`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(postData),
             });
+
+            if (response.status === 201 || response.status === 200) {
+                const newCommentData = await response.json(); // Assuming the server returns the created comment
+                setComments(prevComments => [...prevComments, newCommentData]);
+                setNewComment("");
+            } else {
+                const errorMessage = await response.text();
+                throw new Error(errorMessage || '댓글 업로드에 실패하였습니다.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert(error.message);
+        }
     };
 
     useEffect(() => {
