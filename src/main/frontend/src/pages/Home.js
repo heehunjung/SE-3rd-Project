@@ -156,7 +156,7 @@ const Home = () => {
                                 {likeStocks && likeStocks.length>0 ? (
                                     likeStocks.map(stock=>(
                                         <p key={stock.id}>
-                                            <Link to={`/Trading/${id}?stockId=${stock.id}`} style={{ color: 'white', textDecoration: 'none', fontSize: '1.1em', fontWeight: 'bold' }}>
+                                            <Link to={`/Trading/${id}?stockId=${stock.stock.id}`} style={{ color: 'white', textDecoration: 'none', fontSize: '1.1em', fontWeight: 'bold' }}>
                                                 {stock.stockName}
                                             </Link>
                                         </p>
