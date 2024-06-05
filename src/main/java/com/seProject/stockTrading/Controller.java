@@ -338,7 +338,7 @@ public class Controller {
     @CrossOrigin
     @PostMapping("/sell/{id}")
     public ResponseEntity<?> sell(@PathVariable Long id,@RequestBody MemberStockDTO memberStockDTO) {
-        Optional<MemberStock> memberStock = memberStockRepository.findByStockId(memberStockDTO.getStockId());
+        Optional<MemberStock> memberStock = memberStockRepository.findByMemberIdAndStockId(id, memberStockDTO.getStockId());
         if(memberStock.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("해당 주식을 보유하고 있지 않습니다.");
         }
@@ -438,9 +438,9 @@ public class Controller {
     }
     // memberStock 객체를 가져오는 api by stockId
     @CrossOrigin
-    @GetMapping("/memberStock/stockId/{id}")
-    public ResponseEntity<?> getMemberStocksByStockId(@PathVariable Long id) {
-        Optional<MemberStock> memberStockOpt = memberStockRepository.findByStockId(id);
+    @GetMapping("/memberStock/stockId/{stockId}")
+    public ResponseEntity<?> getMemberStocksByStockId(@PathVariable Long stockId, @RequestParam(required = false) Long memberId) {
+        Optional<MemberStock> memberStockOpt = memberStockRepository.findByMemberIdAndStockId(memberId,stockId);
         if(memberStockOpt.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else{

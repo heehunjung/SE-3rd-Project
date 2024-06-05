@@ -54,7 +54,7 @@ const Trading = () => {
     }, [stockId]);
 
     const fetchLikeCheck = () => {
-        fetch(`http://localhost:8080/memberStock/stockId/${stockId}`)
+        fetch(`http://localhost:8080/memberStock/stockId/${stockId}?memberId=${id}`)
             .then(res => {
                 if (!res.ok) {
                     throw new Error('Network response was not ok');
@@ -205,8 +205,12 @@ const Trading = () => {
             if (res.status !== 200 && res.status !== 201) throw new Error(await res.text());
             const data = await res.text();
             alert(data);
-            const updatedMemberStock = [...memberStock];
+
+            //memberStock Table이 비워져있는 경우
+            const currentMemberStock = Array.isArray(memberStock) ? memberStock : [];
+            const updatedMemberStock = [...currentMemberStock];
             const existingStock = updatedMemberStock.find(s => s.stock.id === stockId);
+
             if (existingStock) {
                 existingStock.quantity = action === 'buy'
                     ? existingStock.quantity + Number(sellBuy.stockQuantity)
@@ -218,17 +222,18 @@ const Trading = () => {
                     createdAt: new Date()
                 });
             }
+
             setMemberStock(updatedMemberStock);
             await fetchMemberInfo();
             await fetchMemberStockData();
             await fetchLikeCheck();
+            await fetchTradeRecords();
             setLikeCheck(data.isPreffered);
         } catch (error) {
             console.error('Error:', error);
             alert(error.message);
         }
     };
-
     const handleClick = () => {
         setIsFilled(!isFilled);
         let like;
@@ -420,7 +425,7 @@ const Trading = () => {
                                             <div style={{
                                                 flex: 1,
                                                 textAlign: 'left'
-                                            }}>{record.type === SELL ? '매수' : '매도'}</div>
+                                            }}>{record.type === SELL ? '매도' : '매수'}</div>
                                         </li>
                                     ))}
                                     </ul>

@@ -29,12 +29,12 @@ const Home = () => {
             })
             .catch(error => setError(error.message));
     }, []);
-    // 관심 종목 요청을 위한 api 호출
+    //관심 종목 요청을 위한 api 호출
     useEffect(()=>{
         fetch(`http://localhost:8080/interestedStock/${id}`)
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    throw new Error('관심 종목이 없습니다.');
                 }
                 return response.json();
             })
@@ -43,7 +43,7 @@ const Home = () => {
             })
             .catch(error => setError(error.message));
     }, [id]);
-
+    //해당 member 객체를 가져옴
     useEffect(() => {
         fetch(`http://localhost:8080/memberInfo/${id}`)
             .then(response => {
@@ -55,7 +55,7 @@ const Home = () => {
             .then(data => setUserData(data))
             .catch(error => setError(error.message));
     }, [id]);
-
+    //상승,하락률 계산 api 호출
     const calculateGainsAndLosses = (stocks) => {
         Promise.all(stocks.map(stock =>
             fetch(`http://localhost:8080/changes/${stock.id}`)
@@ -120,7 +120,7 @@ const Home = () => {
                                         </p>
                                     ))
                                 ) : error ? (
-                                    <p>오류: {error}</p>
+                                    <p></p>
                                 ) : (
                                     <p>데이터를 불러오는 중...</p>
                                 )}
@@ -142,7 +142,7 @@ const Home = () => {
                                         </p>
                                     ))
                                 ) : error ? (
-                                    <p>오류: {error}</p>
+                                    <p></p>
                                 ) : (
                                     <p>데이터를 불러오는 중...</p>
                                 )}
@@ -162,7 +162,7 @@ const Home = () => {
                                         </p>
                                     ))
                                 ) : error ? (
-                                    <p>오류: {error}</p>
+                                    <p>{error}</p>
                                 ) : (
                                     <p>데이터를 불러오는 중...</p>
                                 )}
@@ -192,7 +192,7 @@ const Home = () => {
                                                     </p>
                                                 ))
                                             ) : error ? (
-                                                <p>오류: {error}</p>
+                                                <p></p>
                                             ) : (
                                                 <p>데이터를 불러오는 중...</p>
                                             )}
