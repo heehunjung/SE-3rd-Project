@@ -148,7 +148,7 @@ const View = () => {
 
     return (
         <>
-            <Navbar bg="dark" variant="dark">
+            <Navbar bg="dark" data-bs-theme="dark">
                 <Container>
                     {userData && userData.role === 'ADMIN' ? (
                         <Navbar.Brand href={`/Home/${memberId}`}>KW 거래소📉 관리자 모드</Navbar.Brand>

@@ -270,7 +270,7 @@ const Trading = () => {
 
     const fetchTradeRecords = async () => {
         try {
-            const res = await fetch(`http://localhost:8080/tradeRecords/${id}`);
+            const res = await fetch(`http://localhost:8080/tradeRecords/${id}?stockId=${stockId}`);
             if (!res.ok) throw new Error(await res.text());
             const data = await res.json();
             setTradeRecords(data);
@@ -312,6 +312,7 @@ const Trading = () => {
             theme: { mode: 'dark' }
         },
     };
+    const SELL = "SELL";
 
     return (
         <>
@@ -382,33 +383,47 @@ const Trading = () => {
                             </Card.Body>
                         </Card>
                         <Card>
-                            <Card.Header>거래 기록</Card.Header>
+                            <Card.Header><strong>거래 기록</strong></Card.Header>
                             <Card.Body>
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    fontWeight: 'bold',
+                                    marginBottom: '10px'
+                                }}>
+                                    <div style={{flex: 1, textAlign: 'left'}}>주식 명</div>
+                                    <div style={{flex: 1, textAlign: 'left'}}>주식 명</div>
+                                    <div style={{flex: 1, textAlign: 'left'}}>매수/매도 금액</div>
+                                    <div style={{flex: 1, textAlign: 'left'}}>개수</div>
+                                    <div style={{flex: 1, textAlign: 'left'}}>매수/매도</div>
+                                </div>
                                 {tradeRecords.length === 0 ? (
                                     <p>거래 기록이 없습니다.</p>
                                 ) : (
-                                    <Table striped bordered hover>
-                                        <thead>
-                                            <tr>
-                                                <th>날짜</th>
-                                                <th>종목명</th>
-                                                <th>수량</th>
-                                                <th>가격</th>
-                                                <th>타입</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {tradeRecords.map((record, index) => (
-                                                <tr key={index}>
-                                                    <td>{new Date(record.timestamp).toLocaleString()}</td>
-                                                    <td>{record.stock.stockName}</td>
-                                                    <td>{record.quantity}</td>
-                                                    <td>{record.price.toLocaleString()}원</td>
-                                                    <td>{record.type}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </Table>
+                                    <ul className="scrollable-card5" style={{ listStyleType: 'none', padding: 0 }}>
+                                    {tradeRecords.map((record, index) => (
+                                        <li key={index} style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            marginBottom: '5px',
+                                            marginLeft: '5px'
+                                        }}>
+                                            <div style={{flex: 1, textAlign: 'left'}}>
+                                                {new Date(record.timestamp).toLocaleDateString('ko-KR').replace(/.$/, '')}
+                                            </div>
+                                            <div style={{flex: 1, textAlign: 'left'}}>{record.stock.stockName}</div>
+                                            <div style={{
+                                                flex: 1,
+                                                textAlign: 'left'
+                                            }}>{record.price.toLocaleString()}</div>
+                                            <div style={{flex: 1, textAlign: 'left'}}>{record.quantity}</div>
+                                            <div style={{
+                                                flex: 1,
+                                                textAlign: 'left'
+                                            }}>{record.type === SELL ? '매수' : '매도'}</div>
+                                        </li>
+                                    ))}
+                                    </ul>
                                 )}
                             </Card.Body>
                         </Card>

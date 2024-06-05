@@ -1,4 +1,4 @@
-package com.seProject.stockTrading.domain.trade;
+package com.seProject.stockTrading.domain.tradeRecord;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -10,4 +10,5 @@ public interface TradeRecordRepository extends JpaRepository<TradeRecord, Long> 
     List<TradeRecord> findAllByMemberIdOrderByTimestampDesc(Long memberId);
 
     List<TradeRecord> findByMemberId(Long memberId);
+    List<TradeRecord> findAllByMemberIdAndStockIdOrderByTimestampDesc(Long memberId, Long stockId);
 }

@@ -17,8 +17,8 @@ import com.seProject.stockTrading.domain.stock.Stock;
 import com.seProject.stockTrading.domain.stock.StockRepository;
 import com.seProject.stockTrading.domain.stockPrice.StockPrice;
 import com.seProject.stockTrading.domain.stockPrice.StockPriceRepository;
-import com.seProject.stockTrading.domain.trade.TradeRecord;
-import com.seProject.stockTrading.domain.trade.TradeRecordRepository;
+import com.seProject.stockTrading.domain.tradeRecord.TradeRecord;
+import com.seProject.stockTrading.domain.tradeRecord.TradeRecordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.servlet.HttpEncodingAutoConfiguration;
@@ -450,8 +450,8 @@ public class Controller {
     //거래 기록을 가져오는 API
     @CrossOrigin
     @GetMapping("/tradeRecords/{memberId}")
-    public ResponseEntity<?> getTradeRecords(@PathVariable Long memberId) {
-        List<TradeRecord> tradeRecords = tradeRecordRepository.findByMemberId(memberId);
+    public ResponseEntity<?> getTradeRecords(@PathVariable Long memberId, @RequestParam(required = false) Long stockId) {
+        List<TradeRecord> tradeRecords = tradeRecordRepository.findAllByMemberIdAndStockIdOrderByTimestampDesc(memberId,stockId);
         if (tradeRecords.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("거래 기록이 없습니다.");
         }

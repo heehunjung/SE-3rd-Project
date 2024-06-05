@@ -1,4 +1,4 @@
-package com.seProject.stockTrading.domain.trade;
+package com.seProject.stockTrading.domain.tradeRecord;
 
 import com.seProject.stockTrading.domain.member.Member;
 import com.seProject.stockTrading.domain.stock.Stock;
