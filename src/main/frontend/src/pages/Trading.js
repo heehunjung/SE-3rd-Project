@@ -50,7 +50,6 @@ const Trading = () => {
             })
             .catch(error => {
                 setError(error.message);
-                alert(error.message);
             });
     }, [stockId]);
 
@@ -81,7 +80,6 @@ const Trading = () => {
             fetchUpAndDown(data.id);
         } catch (error) {
             setError(error.message);
-            alert(error.message);
         }
     };
 
@@ -93,7 +91,6 @@ const Trading = () => {
             setStockPrice(data.map(item => ({ x: new Date(item.date), y: item.closingPrice })));
         } catch (error) {
             setError(error.message);
-            alert(error.message);
         }
     };
 
@@ -106,7 +103,6 @@ const Trading = () => {
             setIsFilled(data.isPreferred === 1);
         } catch (error) {
             setError(error.message);
-            alert(error.message);
         }
     };
 
@@ -118,7 +114,6 @@ const Trading = () => {
             fetchStockInfo(data);
         } catch (error) {
             setError(error.message);
-            alert(error.message);
         }
     };
 
@@ -143,7 +138,6 @@ const Trading = () => {
             setIsLoading(false);
         } catch (error) {
             setError(error.message);
-            alert(error.message);
             setIsLoading(false);
         }
     };
@@ -156,7 +150,6 @@ const Trading = () => {
             setChange(data);
         } catch (error) {
             setError(error.message);
-            alert(error.message);
         }
     };
 
@@ -228,6 +221,8 @@ const Trading = () => {
             setMemberStock(updatedMemberStock);
             await fetchMemberInfo();
             await fetchMemberStockData();
+            await fetchLikeCheck();
+            setLikeCheck(data.isPreffered);
         } catch (error) {
             console.error('Error:', error);
             alert(error.message);
@@ -281,7 +276,6 @@ const Trading = () => {
             setTradeRecords(data);
         } catch (error) {
             setError(error.message);
-            alert(error.message);
         }
     };
 
