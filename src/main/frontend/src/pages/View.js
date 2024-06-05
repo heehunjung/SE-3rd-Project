@@ -151,9 +151,9 @@ const View = () => {
             <Navbar bg="dark" variant="dark">
                 <Container>
                     {userData && userData.role === 'ADMIN' ? (
-                        <Navbar.Brand href={`/Home/${id}`}>KW 거래소📉 관리자 모드</Navbar.Brand>
+                        <Navbar.Brand href={`/Home/${memberId}`}>KW 거래소📉 관리자 모드</Navbar.Brand>
                     ) : (
-                        <Navbar.Brand href={`/Home/${id}`}>KW 거래소📉</Navbar.Brand>
+                        <Navbar.Brand href={`/Home/${memberId}`}>KW 거래소📉</Navbar.Brand>
                     )}
                     <Nav className="ml-auto">
                         <Nav.Link href={`/Home/${memberId}`}>홈 화면</Nav.Link>
