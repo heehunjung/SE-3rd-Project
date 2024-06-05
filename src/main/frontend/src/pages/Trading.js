@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import {Nav, Container, Form, Button, Row, Col, Card, Badge, InputGroup} from 'react-bootstrap';
+import { Nav, Container, Form, Button, Row, Col, Card, Badge, InputGroup, Table } from 'react-bootstrap';
 import Navbar from 'react-bootstrap/Navbar';
-import {useLocation, useNavigate, useParams} from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ReactApexChart from 'react-apexcharts';
 import '../App.css';
 import './Board.css';
@@ -15,7 +15,7 @@ const Trading = () => {
     const [stockPrice, setStockPrice] = useState([]);
     const [error, setError] = useState(null);
     const [change, setChange] = useState(null);
-    const [stockName, setStockName] = useState(null);
+    const [stockName, setStockName] = useState('');
     const navigate = useNavigate();
     const [stockYesterday, setStockYesterday] = useState(null);
     const [userData, setUserData] = useState(null);
@@ -24,7 +24,8 @@ const Trading = () => {
     const [totalAmount, setTotalAmount] = useState(null);
     const [memberStock, setMemberStock] = useState(null);
     const [isFilled, setIsFilled] = useState(false);
-    const [likeCheck,setLikeCheck] = useState(null);
+    const [likeCheck, setLikeCheck] = useState(null);
+    const [tradeRecords, setTradeRecords] = useState([]);
     const heartSymbol = isFilled ? '❤️' : '🤍';
 
     useEffect(() => {
@@ -33,7 +34,7 @@ const Trading = () => {
         fetchMemberInfo();
         fetchMemberStockData();
         fetchLikeCheck();
-
+        fetchTradeRecords();
     }, [stockId, id]);
 
     useEffect(() => {
@@ -52,7 +53,7 @@ const Trading = () => {
                 alert(error.message);
             });
     }, [stockId]);
-    // 관심 종목 체크를 가져오는 함수
+
     const fetchLikeCheck = () => {
         fetch(`http://localhost:8080/memberStock/stockId/${stockId}`)
             .then(res => {
@@ -63,14 +64,14 @@ const Trading = () => {
             })
             .then(data => {
                 setLikeCheck(data);
-                setIsFilled(data.isPreferred === 1); // isPreferred 값에 따라 isFilled 설정
+                setIsFilled(data.isPreferred === 1);
             })
             .catch(error => {
                 console.log('오류가 발생했습니다.', error);
                 setError(error.message);
             });
     };
-    // 주식 데이터를 가져오는 함수
+
     const fetchStockData = async () => {
         try {
             const res = await fetch(`http://localhost:8080/stockData/${stockId}`);
@@ -83,7 +84,7 @@ const Trading = () => {
             alert(error.message);
         }
     };
-    // 주식 가격 데이터를 가져오는 함수
+
     const fetchStockPrice = async () => {
         try {
             const res = await fetch(`http://localhost:8080/stockPrice/${stockId}`);
@@ -96,21 +97,19 @@ const Trading = () => {
         }
     };
 
-    // 회원 정보를 가져오는 함수
     const fetchMemberInfo = async () => {
         try {
             const res = await fetch(`http://localhost:8080/memberInfo/${id}`);
             if (!res.ok) throw new Error(await res.text());
             const data = await res.json();
             setUserData(data);
-            setIsFilled(data.isPreferred === 1); // isPreferred 값에 따라 isFilled 설정
+            setIsFilled(data.isPreferred === 1);
         } catch (error) {
             setError(error.message);
             alert(error.message);
         }
     };
 
-    // 회원 주식 데이터를 가져오는 함수
     const fetchMemberStockData = async () => {
         try {
             const res = await fetch(`http://localhost:8080/memberStock/${id}`);
@@ -123,7 +122,6 @@ const Trading = () => {
         }
     };
 
-    // 주식 정보를 가져오는 함수
     const fetchStockInfo = async (memberStockList) => {
         try {
             setIsLoading(true);
@@ -150,7 +148,6 @@ const Trading = () => {
         }
     };
 
-    // 주식 상승률 및 하락률을 가져오는 함수
     const fetchUpAndDown = async (stockId) => {
         try {
             const res = await fetch(`http://localhost:8080/changes/${stockId}`);
@@ -163,12 +160,10 @@ const Trading = () => {
         }
     };
 
-    // 주식 이름을 변경하는 함수
     const handleChange = (e) => {
         setStockName(e.target.value);
     };
 
-    // 매도/매수 수량을 변경하는 함수
     const handleChangeBuySell = (e) => {
         if (!stock) {
             alert('주식 정보를 가져오고 있습니다. 잠시만 기다려주세요.');
@@ -185,7 +180,6 @@ const Trading = () => {
         }
     };
 
-    // 주식 이름으로 주식을 검색하는 함수
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!stockName) {
@@ -202,7 +196,6 @@ const Trading = () => {
         }
     };
 
-    // 매도/매수 요청을 처리하는 함수
     const onSellBuySubmit = async (e, action) => {
         e.preventDefault();
         if (!sellBuy) {
@@ -241,7 +234,6 @@ const Trading = () => {
         }
     };
 
-    // 관심 종목 추가/제거를 처리하는 함수
     const handleClick = () => {
         setIsFilled(!isFilled);
         let like;
@@ -279,6 +271,18 @@ const Trading = () => {
                 console.error('Error:', error);
                 alert(error);
             });
+    };
+
+    const fetchTradeRecords = async () => {
+        try {
+            const res = await fetch(`http://localhost:8080/tradeRecords/${id}`);
+            if (!res.ok) throw new Error(await res.text());
+            const data = await res.json();
+            setTradeRecords(data);
+        } catch (error) {
+            setError(error.message);
+            alert(error.message);
+        }
     };
 
     const chartOptions = {
@@ -385,8 +389,35 @@ const Trading = () => {
                         </Card>
                         <Card>
                             <Card.Header>거래 기록</Card.Header>
+                            <Card.Body>
+                                {tradeRecords.length === 0 ? (
+                                    <p>거래 기록이 없습니다.</p>
+                                ) : (
+                                    <Table striped bordered hover>
+                                        <thead>
+                                            <tr>
+                                                <th>날짜</th>
+                                                <th>종목명</th>
+                                                <th>수량</th>
+                                                <th>가격</th>
+                                                <th>타입</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {tradeRecords.map((record, index) => (
+                                                <tr key={index}>
+                                                    <td>{new Date(record.timestamp).toLocaleString()}</td>
+                                                    <td>{record.stock.stockName}</td>
+                                                    <td>{record.quantity}</td>
+                                                    <td>{record.price.toLocaleString()}원</td>
+                                                    <td>{record.type}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </Table>
+                                )}
+                            </Card.Body>
                         </Card>
-
                     </Col>
                     <Col md={4}>
                         <Card className="mb-4 shadow-sm card-custom">
@@ -449,7 +480,7 @@ const Trading = () => {
                                 ) : memberStock && memberStock.length > 0 ? (
                                     <ul className="scrollable-card4" style={{ listStyleType: 'none', padding: 0 }}>
                                         {memberStock
-                                            .filter(stock => stock.quantity > 0) // quantity가 0보다 큰 항목만 필터링
+                                            .filter(stock => stock.quantity > 0)
                                             .map((stock, index) => (
                                                 <li key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' ,marginLeft:'5px' }}>
                                                     <div style={{ flex: 1, textAlign: 'left' }}>{stock.stockName}</div>
@@ -465,7 +496,6 @@ const Trading = () => {
                         </Card>
                     </Col>
                 </Row>
-
             </Container>
         </>
     );
