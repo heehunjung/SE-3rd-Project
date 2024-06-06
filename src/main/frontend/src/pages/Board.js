@@ -81,7 +81,9 @@ const Board = () => {
                         <Nav.Link href={`/Home/${id}`}>홈 화면</Nav.Link>
                         <Nav.Link href={`/Trading/${id}`}>주식 구매</Nav.Link>
                         <Nav.Link href={`/Board/${id}`}>커뮤니티</Nav.Link>
-                        <Nav.Link href={`/MyInfo/${id}`}>내 정보</Nav.Link>
+                        {userData && userData.role === 'ADMIN' && (
+                                        <Nav.Link href={`/Admin/${id}`}>관리자 모드</Nav.Link>
+                                    )}
                         <Nav.Link href={`/Post/${id}`}>게시글 작성</Nav.Link>
                         <Nav.Link href={'/Login'}>로그아웃</Nav.Link>
                     </Nav>

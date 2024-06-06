@@ -9,6 +9,7 @@ import Board from "./pages/Board";
 import Post from "./pages/Post";
 import View from "./pages/View";
 import Trading from "./pages/Trading";
+import Admin from './pages/Admin'; //admin 추가
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/Post/:id" element={<Post />} />
           <Route path="/ViewPost/:id" element={<View />} />
           <Route path="/Trading/:id" element={<Trading />} />
+          <Route path="/Admin/:id" element={<Admin />} /> //admin 추가
 
       </Routes>
   );

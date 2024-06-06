@@ -458,4 +458,45 @@ public class Controller {
         return ResponseEntity.ok(tradeRecords);
     }
 
+    // 모든 멤버 정보를 가져오는 API 추가
+    @CrossOrigin
+    @GetMapping("/members")
+    public ResponseEntity<?> getAllMembers() {
+        List<Member> members = memberRepository.findAll();
+        if (members.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("회원 정보가 없습니다.");
+        }
+        return ResponseEntity.ok(members);
+    }
+
+    // 멤버 잔액 수정 API 추가
+    @CrossOrigin
+    @PutMapping("/members/{id}/balance")
+    public ResponseEntity<?> updateMemberBalance(@PathVariable Long id, @RequestParam Long amount) {
+        Optional<Member> memberOptional = memberRepository.findById(id);
+        if (memberOptional.isPresent()) {
+            Member member = memberOptional.get();
+            member.setBalance(member.getBalance() + amount);
+            memberRepository.save(member);
+            return ResponseEntity.ok().body("잔액이 성공적으로 수정되었습니다.");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 멤버의 데이터가 존재하지 않아요.");
+        }
+    }
+
+    // 멤버 삭제 API 추가
+    @CrossOrigin
+    @DeleteMapping("/members/{id}")
+    public ResponseEntity<?> deleteMember(@PathVariable Long id) {
+        Optional<Member> memberOptional = memberRepository.findById(id);
+        if (memberOptional.isPresent()) {
+            memberRepository.deleteById(id);
+            return ResponseEntity.ok().body("멤버가 성공적으로 삭제되었습니다.");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 멤버의 데이터가 존재하지 않아요.");
+        }
+    }
+
+
+
 }
