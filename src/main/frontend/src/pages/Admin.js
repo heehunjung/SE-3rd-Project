@@ -137,6 +137,23 @@ const Admin = () => {
             .catch(error => console.error('Error deleting user:', error));
     };
 
+    const handleDeleteStock = (stockId) => {
+        fetch(`http://localhost:8080/stocks/${stockId}`, {
+            method: 'DELETE',
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(data => {
+                alert(data);
+                setStocks(stocks.filter(stock => stock.id !== stockId));
+            })
+            .catch(error => console.error('Error deleting stock:', error));
+    };
+
     return (
         <>
             <Navbar bg="dark" variant="dark">
@@ -183,103 +200,90 @@ const Admin = () => {
                                             <div style={{flex: 1, textAlign: 'left'}}>{post.nickname}</div>
                                             <div style={{flex: 1, textAlign: 'left'}}>
                                                 <Button className="btn-icon" style={{marginLeft: 'auto'}}
-                                                        onClick={() => handleDeletePost(post.postId)}>
+                                                        onClick={() => handleDeletePost(post.id)}>
                                                     ❌
                                                 </Button>
                                             </div>
                                         </li>
                                     ))}
                                 </ul>
-
                             </Card.Body>
                         </Card>
                     </Col>
                 </Row>
                 <Row>
                     <Col>
-                        <h2>유저 관리</h2>
-                        <InputGroup className="mb-3">
-                            <Form.Control
-                                placeholder="금액 입력"
-                                aria-label="금액 입력"
-                                aria-describedby="basic-addon2"
-                                type="number"
-                                onChange={handleAmountChange}
-                            />
-                        </InputGroup>
-                        <Table striped bordered hover>
-                            <thead>
-                            <tr>
-                                <th>닉네임</th>
-                                <th>잔액</th>
-                                <th>관리</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {users.map(user => (
-                                <tr key={user.id}>
-                                    <td>{user.nickname}</td>
-                                    <td>{user.balance}</td>
-                                    <td>
-                                            <Button variant="primary" onClick={() => handleUpdateBalance(user.id)}>금액 추가/삭제</Button>
-                                            <Button variant="danger" onClick={() => handleDeleteUser(user.id)}>삭제</Button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </Table>
+                        <Card className="mb-4 shadow-sm card-custom">
+                            <Card.Header><strong>유저 관리</strong></Card.Header>
+                            <Card.Body>
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    fontWeight: 'bold',
+                                    marginBottom: '10px'
+                                }}>
+                                    <div style={{flex: 1, textAlign: 'left'}}>닉네임</div>
+                                    <div style={{flex: 1, textAlign: 'left'}}>잔액</div>
+                                    <div style={{flex: 1, textAlign: 'left'}}>관리</div>
+                                </div>
+                                <ul className="scrollable-card5" style={{listStyleType: 'none', padding: 0}}>
+                                    {users.map(user => (
+                                        <li key={user.id} style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',  // 요소들을 수직 중앙 정렬
+                                            marginBottom: '5px',
+                                            padding: '5px'
+                                        }}>
+                                            <div style={{flex: 1, textAlign: 'left'}}>{user.nickname}</div>
+                                            <div style={{flex: 1, textAlign: 'left'}}>{user.balance}</div>
+                                            <div style={{flex: 1, textAlign: 'left'}}>
+                                                <Button className="btn-icon" style={{marginLeft: 'auto'}} onClick={() => handleDeleteUser(user.id)}>❌</Button>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </Card.Body>
+                        </Card>
                     </Col>
                 </Row>
                 <Row>
                     <Col>
-                        <h2>주식 관리</h2>
-                        <Form>
-                            <Form.Group>
-                                <Form.Label>주식 이름</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="주식 이름 입력"
-                                    name="stockName"
-                                    value={newStock.stockName}
-                                    onChange={handleStockChange}
-                                />
-                            </Form.Group>
-                            <Form.Group>
-                                <Form.Label>주식 가격</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="주식 가격 입력"
-                                    name="currentPrice"
-                                    value={newStock.currentPrice}
-                                    onChange={handleStockChange}
-                                />
-                            </Form.Group>
-                            <Button variant="primary" onClick={handleAddStock}>추가</Button>
-                        </Form>
-                        <div style={{ maxHeight: '300px', overflowY: 'scroll' }}>
-                            <Table striped bordered hover>
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>이름</th>
-                                        <th>가격</th>
-                                        <th>관리</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                        <Card className="mb-4 shadow-sm card-custom">
+                            <Card.Header><strong>주식 관리</strong></Card.Header>
+                            <Card.Body>
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    fontWeight: 'bold',
+                                    marginBottom: '10px',
+                                    marginTop: '10px'
+                                }}>
+                                    <div style={{flex: 1, textAlign: 'left'}}>ID</div>
+                                    <div style={{flex: 1, textAlign: 'left'}}>이름</div>
+                                    <div style={{flex: 1, textAlign: 'left'}}>가격</div>
+                                    <div style={{flex: 1, textAlign: 'left'}}>관리</div>
+                                </div>
+                                <ul className="scrollable-card5" style={{listStyleType: 'none', padding: 0, maxHeight: '300px', overflowY: 'scroll'}}>
                                     {stocks.map(stock => (
-                                        <tr key={stock.id}>
-                                            <td>{stock.id}</td>
-                                            <td>{stock.stockName}</td>
-                                            <td>{stock.currentPrice}</td>
-                                            <td>
-                                                <Button variant="danger">삭제</Button>
-                                            </td>
-                                        </tr>
+                                        <li key={stock.id} style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',  // 요소들을 수직 중앙 정렬
+                                            marginBottom: '5px',
+                                            padding: '5px'
+                                        }}>
+                                            <div style={{flex: 1, textAlign: 'left'}}>{stock.id}</div>
+                                            <div style={{flex: 1, textAlign: 'left'}}>{stock.stockName}</div>
+                                            <div style={{flex: 1, textAlign: 'left'}}>{stock.currentPrice}</div>
+                                            <div style={{flex: 1, textAlign: 'left'}}>
+                                                <Button className="btn-icon" style={{marginLeft: 'auto'}} onClick={() => handleDeleteStock(stock.id)}>❌</Button>
+                                            </div>
+                                        </li>
                                     ))}
-                                </tbody>
-                            </Table>
-                        </div>
+                                </ul>
+                            </Card.Body>
+                        </Card>
                     </Col>
                 </Row>
             </Container>
