@@ -159,10 +159,10 @@ const View = () => {
                         <Nav.Link href={`/Home/${memberId}`}>홈 화면</Nav.Link>
                         <Nav.Link href={`/Trading/${memberId}`}>주식 구매</Nav.Link>
                         <Nav.Link href={`/Board/${memberId}`}>커뮤니티</Nav.Link>
-                        {userData && userData.role === 'ADMIN' && (
-                                        <Nav.Link href={`/Admin/${id}`}>관리자 모드</Nav.Link>
-                                    )}
                         <Nav.Link href={`/Post/${memberId}`}>게시글 작성</Nav.Link>
+                        {userData && userData.role === 'ADMIN' && (
+                            <Nav.Link href={`/Admin/${id}`}>관리자 모드</Nav.Link>
+                        )}
                         <Nav.Link href={'/Login'}>로그아웃</Nav.Link>
                     </Nav>
                 </Container>

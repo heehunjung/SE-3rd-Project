@@ -3,6 +3,7 @@ import { Nav, Container, Form, Button, Row, Col, Table, InputGroup } from 'react
 import Navbar from 'react-bootstrap/Navbar';
 import { useParams } from 'react-router-dom';
 import '../App.css';
+import Card from "react-bootstrap/Card";
 
 const Admin = () => {
     const { id } = useParams();
@@ -23,7 +24,7 @@ const Admin = () => {
             .then(data => setUsers(data))
             .catch(error => console.error('Error fetching members data:', error));
 
-        fetch(`http://localhost:8080/board`)
+        fetch(`http://localhost:8080/title/username`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -82,7 +83,15 @@ const Admin = () => {
             })
             .then(data => {
                 alert(data);
-                setPosts(posts.filter(post => post.id !== postId));
+                fetch(`http://localhost:8080/title/username`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => setPosts(data))
+                    .catch(error => console.error('Error fetching posts data:', error));
             })
             .catch(error => console.error('Error deleting post:', error));
     };
@@ -137,8 +146,8 @@ const Admin = () => {
                         <Nav.Link href={`/Home/${id}`}>홈 화면</Nav.Link>
                         <Nav.Link href={`/Trading/${id}`}>주식 구매</Nav.Link>
                         <Nav.Link href={`/Board/${id}`}>커뮤니티</Nav.Link>
-                        <Nav.Link href={`/Admin/${id}`}>관리자 모드</Nav.Link>
                         <Nav.Link href={`/Post/${id}`}>게시글 작성</Nav.Link>
+                        <Nav.Link href={`/Admin/${id}`}>관리자 모드</Nav.Link>
                         <Nav.Link href={'/Login'}>로그아웃</Nav.Link>
                     </Nav>
                 </Container>
@@ -146,29 +155,44 @@ const Admin = () => {
             <Container>
                 <Row>
                     <Col>
-                        <h2>게시글 관리</h2>
-                        <Table striped bordered hover>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>제목</th>
-                                    <th>작성자</th>
-                                    <th>관리</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {posts.map(post => (
-                                    <tr key={post.id}>
-                                        <td>{post.id}</td>
-                                        <td>{post.title}</td>
-                                        <td>{post.author}</td>
-                                        <td>
-                                            <Button variant="danger" onClick={() => handleDeletePost(post.id)}>삭제</Button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </Table>
+                        <Card className="mb-4 shadow-sm card-custom">
+                            <Card.Header><strong>게시글 관리</strong></Card.Header>
+                            <Card.Body>
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    fontWeight: 'bold',
+                                    marginBottom: '10px'
+                                }}>
+                                    <div style={{flex: 1, textAlign: 'left'}}>제목</div>
+                                    <div style={{flex: 1, textAlign: 'left'}}>ID</div>
+                                    <div style={{flex: 1, textAlign: 'left'}}>작성자</div>
+                                    <div style={{flex: 1, textAlign: 'left'}}>관리</div>
+                                </div>
+                                <ul className="scrollable-card5" style={{listStyleType: 'none', padding: 0}}>
+                                    {posts.map(post => (
+                                        <li key={post.id} style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',  // 요소들을 수직 중앙 정렬
+                                            marginBottom: '5px',
+                                            padding: '5px'
+                                        }}>
+                                            <div style={{flex: 1, textAlign: 'left'}}>{post.title}</div>
+                                            <div style={{flex: 1, textAlign: 'left'}}>{post.username}</div>
+                                            <div style={{flex: 1, textAlign: 'left'}}>{post.nickname}</div>
+                                            <div style={{flex: 1, textAlign: 'left'}}>
+                                                <Button className="btn-icon" style={{marginLeft: 'auto'}}
+                                                        onClick={() => handleDeletePost(post.postId)}>
+                                                    ❌
+                                                </Button>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+
+                            </Card.Body>
+                        </Card>
                     </Col>
                 </Row>
                 <Row>
@@ -185,20 +209,18 @@ const Admin = () => {
                         </InputGroup>
                         <Table striped bordered hover>
                             <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>닉네임</th>
-                                    <th>잔액</th>
-                                    <th>관리</th>
-                                </tr>
+                            <tr>
+                                <th>닉네임</th>
+                                <th>잔액</th>
+                                <th>관리</th>
+                            </tr>
                             </thead>
                             <tbody>
-                                {users.map(user => (
-                                    <tr key={user.id}>
-                                        <td>{user.id}</td>
-                                        <td>{user.nickname}</td>
-                                        <td>{user.balance}</td>
-                                        <td>
+                            {users.map(user => (
+                                <tr key={user.id}>
+                                    <td>{user.nickname}</td>
+                                    <td>{user.balance}</td>
+                                    <td>
                                             <Button variant="primary" onClick={() => handleUpdateBalance(user.id)}>금액 추가/삭제</Button>
                                             <Button variant="danger" onClick={() => handleDeleteUser(user.id)}>삭제</Button>
                                         </td>

@@ -2,6 +2,7 @@ package com.seProject.stockTrading;
 
 import com.seProject.stockTrading.domain.commets.Comment;
 import com.seProject.stockTrading.domain.commets.CommentRepository;
+import com.seProject.stockTrading.domain.dto.MemberPostDTO;
 import com.seProject.stockTrading.domain.dto.StockLikeDTO;
 import com.seProject.stockTrading.domain.member.Member;
 import com.seProject.stockTrading.domain.dto.MemberDTO;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -457,7 +459,6 @@ public class Controller {
         }
         return ResponseEntity.ok(tradeRecords);
     }
-
     // 모든 멤버 정보를 가져오는 API 추가
     @CrossOrigin
     @GetMapping("/members")
@@ -468,7 +469,6 @@ public class Controller {
         }
         return ResponseEntity.ok(members);
     }
-
     // 멤버 잔액 수정 API 추가
     @CrossOrigin
     @PutMapping("/members/{id}/balance")
@@ -483,7 +483,6 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 멤버의 데이터가 존재하지 않아요.");
         }
     }
-
     // 멤버 삭제 API 추가
     @CrossOrigin
     @DeleteMapping("/members/{id}")
@@ -496,7 +495,25 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 멤버의 데이터가 존재하지 않아요.");
         }
     }
+    // 모든 게시글 제목과 작성자를 반환하는 api
+    @CrossOrigin
+    @GetMapping("title/username")
+    public ResponseEntity<?> getPostNameMember() {
+        List<Post> postInfo = postRepository.findAllByOrderByCreatedAtDesc();
+        if (postInfo.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시물이 없습니다.");
+        }
 
+        List<MemberPostDTO> memberPostDTOList = new ArrayList<>();
 
-
+        for (Post post : postInfo) {
+            Optional<Member> memberOpt = memberRepository.findById(post.getMember().getId());
+            if (memberOpt.isPresent()) {
+                Member member = memberOpt.get();
+                MemberPostDTO memberPostDTO = new MemberPostDTO(post.getTitle(), member.getUsername(),member.getNickname(), post.getId());
+                memberPostDTOList.add(memberPostDTO);
+            }
+        }
+        return ResponseEntity.ok(memberPostDTOList);
+    }
 }
