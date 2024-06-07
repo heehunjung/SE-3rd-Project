@@ -11,4 +11,6 @@ public interface TradeRecordRepository extends JpaRepository<TradeRecord, Long> 
 
     List<TradeRecord> findByMemberId(Long memberId);
     List<TradeRecord> findAllByMemberIdAndStockIdOrderByTimestampDesc(Long memberId, Long stockId);
+    // 추가: stockId로 TradeRecord 삭제
+    List<TradeRecord> findAllByStockId(Long stockId);
 }

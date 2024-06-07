@@ -48,6 +48,7 @@ public class Controller {
     CommentRepository commentRepository;
     StockRepository stockRepository;
     StockPriceRepository stockPriceRepository;
+
     @Autowired
     public Controller(
             PostService postService,
@@ -57,8 +58,9 @@ public class Controller {
             CommentRepository commentRepository,
             StockRepository stockRepository,
             StockPriceRepository stockPriceRepository,
-            HttpEncodingAutoConfiguration httpEncodingAutoConfiguration, MemberStockRepository memberStockRepository,
-            TradeRecordRepository tradeRecordRepository){
+            HttpEncodingAutoConfiguration httpEncodingAutoConfiguration,
+            MemberStockRepository memberStockRepository,
+            TradeRecordRepository tradeRecordRepository) {
         this.memberRepository = memberRepository;
         this.memberService = memberService;
         this.postRepository = postRepository;
@@ -74,23 +76,25 @@ public class Controller {
     // 모든 게시물을 list 형태로 가져오는 api
     @CrossOrigin
     @GetMapping("/board")
-    public ResponseEntity<?> getBoard(){
+    public ResponseEntity<?> getBoard() {
         List<Post> postInfo = postRepository.findAllByOrderByCreatedAtDesc();
         if (postInfo.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시물이 없습니다.");
         }
         return ResponseEntity.ok(postInfo);
     }
+
     // 특정 게시물을 가져오는 api
     @CrossOrigin
     @GetMapping("/board/{id}")
-    public ResponseEntity<?> getBoard(@PathVariable Long id){
+    public ResponseEntity<?> getBoard(@PathVariable Long id) {
         Optional<Post> postInfo = postRepository.findById(id);
         if (postInfo.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시물이 없습니다.");
         }
         return ResponseEntity.ok(postInfo);
     }
+
     // 멤버 id로 해당 멤버 객체 가져오는 api
     @CrossOrigin
     @GetMapping("/memberInfo/{id}")
@@ -102,10 +106,11 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 멤버의 데이터가 존재하지 않아요.");
         }
     }
-    //stock_price 를 stock_id로 가져오는 api
+
+    // stock_price 를 stock_id로 가져오는 api
     @CrossOrigin
     @GetMapping("/stockData/yesterDay/{stockId}")
-    public ResponseEntity<?> getStockPriceToday(@PathVariable Long stockId){
+    public ResponseEntity<?> getStockPriceToday(@PathVariable Long stockId) {
         Optional<StockPrice> stockPrice = stockPriceRepository.findTop1ByStockIdOrderByDateDesc(stockId);
         if (stockPrice.isPresent()) {
             return ResponseEntity.ok(stockPrice.get());
@@ -113,6 +118,7 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 주식 데이터가 존재하지 않아요.");
         }
     }
+
     // 해당 게시글의 댓글을 리스트 형태로 가져오는 api
     @CrossOrigin
     @GetMapping("/getComment/{postId}")
@@ -120,6 +126,7 @@ public class Controller {
         List<Comment> comments = commentRepository.findAllByPostId(postId);
         return ResponseEntity.ok(comments);
     }
+
     // login api
     @CrossOrigin
     @PostMapping("/login")
@@ -134,6 +141,7 @@ public class Controller {
             return ResponseEntity.ok(Collections.singletonMap("id", member.getId()));
         }
     }
+
     // join api
     @CrossOrigin
     @PostMapping("/join")
@@ -146,12 +154,14 @@ public class Controller {
         }
         return new ResponseEntity<>(memberRepository.save(member), HttpStatus.CREATED);
     }
+
     // 게시글 upload api
     @CrossOrigin
     @PostMapping("/post")
     public ResponseEntity<?> post(@RequestBody Post post) {
         return new ResponseEntity<>(postRepository.save(post), HttpStatus.CREATED);
     }
+
     // 게시글 delete api
     @CrossOrigin
     @DeleteMapping("/delete/{id}")
@@ -167,10 +177,11 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("게시글 삭제 중 오류가 발생했습니다.");
         }
     }
+
     // 게시글 edit api
     @CrossOrigin
     @PutMapping("/post/{postId}")
-    public ResponseEntity<?> edit(@PathVariable Long postId,@RequestBody Post post) {
+    public ResponseEntity<?> edit(@PathVariable Long postId, @RequestBody Post post) {
         try {
             Optional<Post> optionalPost = postRepository.findById(postId);
             if (optionalPost.isPresent()) {
@@ -185,13 +196,15 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("게시글 수정 중 오류가 발생했습니다.");
         }
     }
+
     // 댓글 upload api
     @CrossOrigin
     @PostMapping("/postComment")
     public ResponseEntity<?> uploadComment(@RequestBody Comment comment) {
-        return new ResponseEntity<>(commentRepository.save(comment),HttpStatus.CREATED);
+        return new ResponseEntity<>(commentRepository.save(comment), HttpStatus.CREATED);
     }
-    //조회수 +1 update api
+
+    // 조회수 +1 update api
     @CrossOrigin
     @PutMapping("/viewCount/{postId}")
     public ResponseEntity<?> incrementViewCount(@PathVariable Long postId) {
@@ -209,6 +222,7 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("조회수 증가 중 오류가 발생했습니다.");
         }
     }
+
     // 상승률,하락률를 계산하여 table에 넣는 api
     @CrossOrigin
     @GetMapping("/changes/{stockId}")
@@ -220,7 +234,7 @@ public class Controller {
 
         Optional<StockPrice> currentPriceOpt = stockPriceRepository.findTop1ByStockIdOrderByDateDesc(stockId);
         if (currentPriceOpt.isEmpty()) {
-            return ResponseEntity.status(404).body("주식 가 정보가 없습니다.");
+            return ResponseEntity.status(404).body("주식 가격 정보가 없습니다.");
         }
 
         StockPrice currentPrice = currentPriceOpt.get();
@@ -236,27 +250,30 @@ public class Controller {
         float change = (currentPrice.getClosingPrice() - pastPrice.getClosingPrice()) / pastPrice.getClosingPrice();
         return ResponseEntity.ok(change);
     }
+
     // Stock table 정보를 요청하는 api
     @CrossOrigin
     @GetMapping("/stockData")
     public ResponseEntity<?> getStockData() {
         List<Stock> StockData = stockRepository.findAll();
-        if(StockData.isEmpty()){
+        if (StockData.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("주식 정보가 없습니다.");
         }
         return ResponseEntity.ok(StockData);
     }
+
     // 특정 Stock 정보를 전달하는 api
     @CrossOrigin
     @GetMapping("/stockData/{stockId}")
     public ResponseEntity<?> getStockData(@PathVariable Long stockId) {
         Optional<Stock> stockOpt = stockRepository.findById(stockId);
-        if(stockOpt.isEmpty()) {
+        if (stockOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 주식 정보가 없습니다.");
         } else {
             return ResponseEntity.ok(stockOpt.get());
         }
     }
+
     // 특정 Stock Price 정보를 전달하는 api
     @CrossOrigin
     @GetMapping("/stockPrice/{stockId}")
@@ -264,28 +281,31 @@ public class Controller {
         List<StockPrice> stockPrices = stockPriceRepository.findAllByStockId(stockId);
         return ResponseEntity.ok(stockPrices);
     }
+
     // Stock id로 Stock 찾는 api
     @CrossOrigin
     @GetMapping("/stockData/name/{stockName}")
     public ResponseEntity<?> getStockData(@PathVariable String stockName) {
         Optional<Stock> stockOpt = stockRepository.findAllByStockName(stockName);
-        if(stockOpt.isEmpty()) {
+        if (stockOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 주식 정보가 없습니다.");
         } else {
             return ResponseEntity.ok(stockOpt.get());
         }
     }
-    //닉네임 중복 체크를 위한 api
+
+    // 닉네임 중복 체크를 위한 api
     @CrossOrigin
     @GetMapping("/nickname/{nickName}")
     public ResponseEntity<?> getNickname(@PathVariable String nickName) {
         Optional<Member> memberOpt = memberRepository.findByNickname(nickName);
-        if(memberOpt.isEmpty()) {
+        if (memberOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용가능한 닉네임입니다.");
         } else {
             return ResponseEntity.ok("중복된 닉네임입니다.");
         }
     }
+
     // 매수 API
     @CrossOrigin
     @PostMapping("/buy/{id}")
@@ -336,20 +356,21 @@ public class Controller {
 
         return new ResponseEntity<>("매수에 성공하였습니다.", HttpStatus.CREATED);
     }
-    //매도 api
+
+    // 매도 api
     @CrossOrigin
     @PostMapping("/sell/{id}")
-    public ResponseEntity<?> sell(@PathVariable Long id,@RequestBody MemberStockDTO memberStockDTO) {
+    public ResponseEntity<?> sell(@PathVariable Long id, @RequestBody MemberStockDTO memberStockDTO) {
         Optional<MemberStock> memberStock = memberStockRepository.findByMemberIdAndStockId(id, memberStockDTO.getStockId());
-        if(memberStock.isEmpty()) {
+        if (memberStock.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("해당 주식을 보유하고 있지 않습니다.");
         }
         Optional<Stock> stock = stockRepository.findById(memberStockDTO.getStockId());
-        if(stock.isEmpty()) {
+        if (stock.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 주식 정보가 없습니다.");
         }
         Optional<Member> member = memberRepository.findById(id);
-        if(member.isEmpty()) {
+        if (member.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 멤버 정보가 없습니다.");
         }
         Long currentQuantity = memberStock.get().getQuantity();
@@ -360,12 +381,12 @@ public class Controller {
         Long currentBalance = member.get().getBalance();
         Long totalCost = (long) (memberStockDTO.getStockQuantity() * stock.get().getCurrentPrice());
         member.get().setBalance(currentBalance + totalCost);
-        memberStock.get().setQuantity(currentQuantity-memberStockDTO.getStockQuantity());
+        memberStock.get().setQuantity(currentQuantity - memberStockDTO.getStockQuantity());
         memberStock.get().setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
         memberStock.get().setStockName(stock.get().getStockName());
         memberStockRepository.save(memberStock.get());
 
-        //거래 기록 추가
+        // 거래 기록 추가
         TradeRecord tradeRecord = new TradeRecord();
         tradeRecord.setMember(member.get());
         tradeRecord.setStock(stock.get());
@@ -375,23 +396,23 @@ public class Controller {
         tradeRecord.setTimestamp(Timestamp.valueOf(LocalDateTime.now()));
         tradeRecordRepository.save(tradeRecord);
         return ResponseEntity.ok("매도에 성공하였습니다.");
-
     }
-    //관심종목 api
+
+    // 관심종목 api
     @CrossOrigin
     @PostMapping("/interestedStock/{id}")
     public ResponseEntity<?> interestedStock(@PathVariable Long id, @RequestBody StockLikeDTO stockLikeDTO) {
         Optional<MemberStock> memberStockOpt = memberStockRepository.findByStockId(stockLikeDTO.getStockId());
         Optional<Stock> stock = stockRepository.findById(stockLikeDTO.getStockId());
-        if(stock.isEmpty()) {
+        if (stock.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 주식 정보가 없습니다.");
         }
         Optional<Member> member = memberRepository.findById(id);
-        if(member.isEmpty()) {
+        if (member.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 멤버 정보가 없습니다.");
         }
-        if(memberStockOpt.isPresent()) {
-            if(stockLikeDTO.getLike()==0){
+        if (memberStockOpt.isPresent()) {
+            if (stockLikeDTO.getLike() == 0) {
                 memberStockOpt.get().setIsPreferred(0);
             } else {
                 memberStockOpt.get().setIsPreferred(1);
@@ -404,7 +425,7 @@ public class Controller {
             return ResponseEntity.ok("관심 종목 등록에 성공하였습니다.");
         } else {
             MemberStock memberStockObj = new MemberStock();
-            if(stockLikeDTO.getLike()==0){
+            if (stockLikeDTO.getLike() == 0) {
                 memberStockObj.setIsPreferred(0);
             } else {
                 memberStockObj.setIsPreferred(1);
@@ -418,47 +439,52 @@ public class Controller {
         }
 
     }
-    //관심 종목을 LIST 형태로 제공하는 api
+
+    // 관심 종목을 LIST 형태로 제공하는 api
     @CrossOrigin
     @GetMapping("interestedStock/{id}")
     public ResponseEntity<?> interestedStock(@PathVariable Long id) {
-        List<MemberStock> memberStockOpt = memberStockRepository.findByIsPreferredAndMemberId(1,id);
-        if(memberStockOpt.isEmpty()) {
+        List<MemberStock> memberStockOpt = memberStockRepository.findByIsPreferredAndMemberId(1, id);
+        if (memberStockOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("선호 종목이 없습니다.");
         }
         return ResponseEntity.ok(memberStockOpt);
     }
+
     // memberStock List 가져오는 api
     @CrossOrigin
     @GetMapping("/memberStock/{id}")
     public ResponseEntity<?> getMemberStocks(@PathVariable Long id) {
-        List<MemberStock> memberStocks=memberStockRepository.findAllByMemberId(id);
+        List<MemberStock> memberStocks = memberStockRepository.findAllByMemberId(id);
         if (memberStocks.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 정보가 없습니다.");
         }
         return ResponseEntity.ok(memberStocks);
     }
+
     // memberStock 객체를 가져오는 api by stockId
     @CrossOrigin
     @GetMapping("/memberStock/stockId/{stockId}")
     public ResponseEntity<?> getMemberStocksByStockId(@PathVariable Long stockId, @RequestParam(required = false) Long memberId) {
-        Optional<MemberStock> memberStockOpt = memberStockRepository.findByMemberIdAndStockId(memberId,stockId);
-        if(memberStockOpt.isEmpty()) {
+        Optional<MemberStock> memberStockOpt = memberStockRepository.findByMemberIdAndStockId(memberId, stockId);
+        if (memberStockOpt.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else{
+        } else {
             return ResponseEntity.ok(memberStockOpt.get());
         }
     }
-    //거래 기록을 가져오는 API
+
+    // 거래 기록을 가져오는 API
     @CrossOrigin
     @GetMapping("/tradeRecords/{memberId}")
     public ResponseEntity<?> getTradeRecords(@PathVariable Long memberId, @RequestParam(required = false) Long stockId) {
-        List<TradeRecord> tradeRecords = tradeRecordRepository.findAllByMemberIdAndStockIdOrderByTimestampDesc(memberId,stockId);
+        List<TradeRecord> tradeRecords = tradeRecordRepository.findAllByMemberIdAndStockIdOrderByTimestampDesc(memberId, stockId);
         if (tradeRecords.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("거래 기록이 없습니다.");
         }
         return ResponseEntity.ok(tradeRecords);
     }
+
     // 모든 멤버 정보를 가져오는 API 추가
     @CrossOrigin
     @GetMapping("/members")
@@ -469,6 +495,7 @@ public class Controller {
         }
         return ResponseEntity.ok(members);
     }
+
     // 멤버 잔액 수정 API 추가
     @CrossOrigin
     @PutMapping("/members/{id}/balance")
@@ -483,6 +510,7 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 멤버의 데이터가 존재하지 않아요.");
         }
     }
+
     // 멤버 삭제 API 추가
     @CrossOrigin
     @DeleteMapping("/members/{id}")
@@ -495,6 +523,7 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 멤버의 데이터가 존재하지 않아요.");
         }
     }
+
     // 모든 게시글 제목과 작성자를 반환하는 api
     @CrossOrigin
     @GetMapping("title/username")
@@ -510,10 +539,37 @@ public class Controller {
             Optional<Member> memberOpt = memberRepository.findById(post.getMember().getId());
             if (memberOpt.isPresent()) {
                 Member member = memberOpt.get();
-                MemberPostDTO memberPostDTO = new MemberPostDTO(post.getTitle(), member.getUsername(),member.getNickname(), post.getId());
+                MemberPostDTO memberPostDTO = new MemberPostDTO(post.getTitle(), member.getUsername(), member.getNickname(), post.getId());
                 memberPostDTOList.add(memberPostDTO);
             }
         }
         return ResponseEntity.ok(memberPostDTOList);
     }
+
+    // admin에서 주식을 삭제하는 api
+    @CrossOrigin
+    @DeleteMapping("/stocks/{stockId}")
+    public ResponseEntity<?> deleteStock(@PathVariable Long stockId) {
+        try {
+            // 먼저 연관된 StockPrice 삭제
+            List<StockPrice> stockPrices = stockPriceRepository.findAllByStockId(stockId);
+            stockPriceRepository.deleteAll(stockPrices);
+
+            // 그 다음 연관된 TradeRecord 삭제
+            List<TradeRecord> tradeRecords = tradeRecordRepository.findAllByStockId(stockId);
+            tradeRecordRepository.deleteAll(tradeRecords);
+
+            // 연관된 MemberStock 삭제
+            List<MemberStock> memberStocks = memberStockRepository.findAllByStockId(stockId);
+            memberStockRepository.deleteAll(memberStocks);
+
+            // 마지막으로 Stock 삭제
+            stockRepository.deleteById(stockId);
+
+            return ResponseEntity.ok("주식이 성공적으로 삭제되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 시 문제가 발생했습니다: " + e.getMessage());
+        }
+    }
+
 }

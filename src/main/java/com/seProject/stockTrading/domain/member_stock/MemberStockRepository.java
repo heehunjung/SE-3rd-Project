@@ -13,4 +13,8 @@ public interface MemberStockRepository extends JpaRepository<MemberStock, Long> 
     Optional<MemberStock> findByStockId(Long stockId);
     Optional<MemberStock> findByMemberIdAndStockId(Long memberId, Long stockId);
     List<MemberStock> findByIsPreferredAndMemberId(int isPreferred, Long member_id);
+    // 추가: stockId로 MemberStock 삭제
+    // 추가된 메서드
+    List<MemberStock> findAllByStockId(Long stockId);
+
 }
