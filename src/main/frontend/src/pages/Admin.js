@@ -101,12 +101,11 @@ const Admin = () => {
     };
 
     const handleUpdateBalance = (userId) => {
-        fetch(`http://localhost:8080/updateBalance/${userId}`, {
+        fetch(`http://localhost:8080/members/${userId}/balance?amount=${amount}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(amount),
         })
             .then(response => {
                 if (!response.ok) {
@@ -121,7 +120,7 @@ const Admin = () => {
     };
 
     const handleDeleteUser = (userId) => {
-        fetch(`http://localhost:8080/member/${userId}`, {
+        fetch(`http://localhost:8080/members/${userId}`, {
             method: 'DELETE',
         })
             .then(response => {
@@ -141,17 +140,17 @@ const Admin = () => {
         fetch(`http://localhost:8080/stocks/${stockId}`, {
             method: 'DELETE',
         })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.text();
-            })
-            .then(data => {
-                alert(data);
-                setStocks(stocks.filter(stock => stock.id !== stockId));
-            })
-            .catch(error => console.error('Error deleting stock:', error));
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text();
+        })
+        .then(data => {
+            alert(data);
+            setStocks(stocks.filter(stock => stock.id !== stockId));
+        })
+        .catch(error => console.error('Error deleting stock:', error));
     };
 
     return (
