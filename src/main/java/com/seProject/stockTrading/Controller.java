@@ -2,14 +2,11 @@ package com.seProject.stockTrading;
 
 import com.seProject.stockTrading.domain.commets.Comment;
 import com.seProject.stockTrading.domain.commets.CommentRepository;
-import com.seProject.stockTrading.domain.dto.MemberPostDTO;
-import com.seProject.stockTrading.domain.dto.StockLikeDTO;
+import com.seProject.stockTrading.domain.dto.*;
 import com.seProject.stockTrading.domain.member.Member;
-import com.seProject.stockTrading.domain.dto.MemberDTO;
 import com.seProject.stockTrading.domain.member.MemberRepository;
 import com.seProject.stockTrading.domain.member.MemberService;
 import com.seProject.stockTrading.domain.member_stock.MemberStock;
-import com.seProject.stockTrading.domain.dto.MemberStockDTO;
 import com.seProject.stockTrading.domain.member_stock.MemberStockRepository;
 import com.seProject.stockTrading.domain.post.Post;
 import com.seProject.stockTrading.domain.post.PostRepository;
@@ -23,17 +20,16 @@ import com.seProject.stockTrading.domain.tradeRecord.TradeRecordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.servlet.HttpEncodingAutoConfiguration;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.data.domain.Pageable;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -402,7 +398,7 @@ public class Controller {
     @CrossOrigin
     @PostMapping("/interestedStock/{id}")
     public ResponseEntity<?> interestedStock(@PathVariable Long id, @RequestBody StockLikeDTO stockLikeDTO) {
-        Optional<MemberStock> memberStockOpt = memberStockRepository.findByStockId(stockLikeDTO.getStockId());
+        Optional<MemberStock> memberStockOpt = memberStockRepository.findByMemberIdAndStockId(id,stockLikeDTO.getStockId());
         Optional<Stock> stock = stockRepository.findById(stockLikeDTO.getStockId());
         if (stock.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 주식 정보가 없습니다.");
@@ -437,7 +433,6 @@ public class Controller {
             memberStockRepository.save(memberStockObj);
             return ResponseEntity.ok("관심 종목 등록에 성공하였습니다.");
         }
-
     }
 
     // 관심 종목을 LIST 형태로 제공하는 api
@@ -572,4 +567,30 @@ public class Controller {
         }
     }
 
+    // 관심 종목 선택이 가장 많이 된 5개 주식을 return
+    @CrossOrigin
+    @GetMapping("/memberStock/topPreferred")
+    public ResponseEntity<?> getTop5PreferredStocks() {
+        Pageable topFive = PageRequest.of(0, 5);  // 첫 번째 페이지의 5개의 항목
+        List<StockDTO> topPreferredStocks = memberStockRepository.findTop5PreferredStocks(topFive);
+        if (topPreferredStocks.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 정보가 없습니다.");
+        }
+        return ResponseEntity.ok(topPreferredStocks);
+    }
+    // 랜덤 주식 api
+    @CrossOrigin
+    @GetMapping("/stockData/random")
+    public ResponseEntity<?> getRandomStockData() {
+        List<Stock> stockData = stockRepository.findAll();
+        if (stockData.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("주식 정보가 없습니다.");
+        }
+
+        Random random = new Random();
+        int randomIndex = random.nextInt(stockData.size());
+        Stock randomStock = stockData.get(randomIndex);
+
+        return ResponseEntity.ok(randomStock);
+    }
 }

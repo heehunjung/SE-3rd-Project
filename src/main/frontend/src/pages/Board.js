@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from "react-bootstrap/Navbar";
-import { Container, Nav, Tab, Tabs, Row, Col, Card, Badge } from "react-bootstrap";
+import {Container, Nav, Tab, Tabs, Row, Col, Card, Badge, Button} from "react-bootstrap";
 import { useParams, Link } from "react-router-dom";
 import './Board.css'; // 추가된 스타일 시트
 
@@ -9,7 +9,7 @@ const Board = () => {
     const [error, setError] = useState(null);
     const [boardData, setBoardData] = useState([]);
     const [userData, setUserData] = useState(null);
-
+    const [stockData, setStockData] = useState(null);
     useEffect(() => {
         fetch(`http://localhost:8080/memberInfo/${id}`)
             .then(response => {
@@ -22,9 +22,6 @@ const Board = () => {
                 setUserData(data);
             })
             .catch(error => setError(error.message));
-    }, [id]);
-
-    useEffect(() => {
         fetch(`http://localhost:8080/board`)
             .then(response => {
                 if (!response.ok) {
@@ -35,6 +32,21 @@ const Board = () => {
             .then(data => setBoardData(data))
             .catch(error => setError(error.message));
     }, [id]);
+
+    const fetchRandomStockData = () => {
+        fetch(`http://localhost:8080/stockData/random`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                setStockData(data);
+                setError(null); // Clear any previous errors
+            })
+            .catch(error => setError(error.message));
+    };
 
     const filterPosts = (boardType) => {
         return boardData.filter(post => post.board === boardType);
@@ -215,12 +227,25 @@ const Board = () => {
                 <Row>
                     <Col>
                         <Card>
-                            <Card.Header>🔀랜덤 주식 추천🔀</Card.Header>
-                            <Card.Body>
-                                <Card.Text>
-                                    <p>게시글이 없습니다.</p>
-                                </Card.Text>
-                            </Card.Body>
+                            <Card.Header>
+                                <Button className="btn-icon" onClick={fetchRandomStockData} variant="primary">🔀</Button>
+                                랜덤 주식 추천
+                                <Button className="btn-icon" onClick={fetchRandomStockData} variant="primary">🔀</Button>
+                            </Card.Header>
+                                <Card.Body>
+                                    {stockData ? (
+                                        <>
+                                            <Link to={`/Trading/${id}?stockId=${stockData.id}`} style={{ color: 'white', textDecoration: 'none', fontSize: '1.1em', fontWeight: 'bold' }}>
+                                                {stockData.stockName}
+                                            </Link>
+                                            <Badge bg="secondary" style={{ marginLeft: '10px' }}>종목 코드: {stockData.stockSymbol}</Badge>
+                                            <br />
+                                            {stockData.content ? <strong style={{ fontSize: '0.8em' }}>{stockData.content}</strong> : <strong style={{ fontSize: '0.9em' }}>정보 미제공</strong>}
+                                        </>
+                                    ) : (
+                                        <p>랜덤 주식 정보를 가져오려면 버튼을 클릭하세요.</p>
+                                    )}
+                                </Card.Body>
                         </Card>
                     </Col>
                 </Row>

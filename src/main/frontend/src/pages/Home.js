@@ -15,6 +15,7 @@ const Home = () => {
     const [topGainers, setTopGainers] = useState([]);
     const [topLosers, setTopLosers] = useState([]);
     const [likeStocks, setLikeStocks] = useState(null);
+    const [top5Stocks, setTop5Stocks] = useState(null);
     useEffect(() => {
         fetch(`http://localhost:8080/stockData`)
             .then(response => {
@@ -26,6 +27,19 @@ const Home = () => {
             .then(data => {
                 setStockData(data); // 전체 주식 데이터 설정
                 calculateGainsAndLosses(data);
+            })
+            .catch(error => setError(error.message));
+    }, []);
+    useEffect(() => {
+        fetch(`http://localhost:8080/memberStock/topPreferred`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                setTop5Stocks(data); // 전체 주식 데이터 설정
             })
             .catch(error => setError(error.message));
     }, []);
@@ -201,6 +215,24 @@ const Home = () => {
                                         </Card.Body>
                                     </Tab>
                                     <Tab eventKey="today" title="오늘의 주식">
+                                        <Card.Body className="scrollable-card">
+                                            {top5Stocks && top5Stocks.length > 0 ? (
+                                                top5Stocks.map(stock => (
+                                                    <p key={stock.stockId}>
+                                                        <Link to={`/Trading/${id}?stockId=${stock.stockId}`} style={{ color: 'white', textDecoration: 'none', fontSize: '1.1em', fontWeight: 'bold' }}>
+                                                            {stock.stockName}
+                                                        </Link>
+                                                        <Badge bg="secondary" style={{ marginLeft: '10px'}}>종목 코드: {stock.stockSymbol}</Badge>
+                                                         ❤️{stock.like}
+                                                        <br />
+                                                        {stock.content ? <strong style={{fontSize: '0.8em'}} >{stock.content}</strong> : <strong style={{fontSize: '0.9em'}}>정보 미제공</strong>}                                                    </p>
+                                                ))
+                                            ) : error ? (
+                                                <p></p>
+                                            ) : (
+                                                <p>데이터를 불러오는 중...</p>
+                                            )}
+                                        </Card.Body>
                                     </Tab>
                                 </Tabs>
                             </Card.Header>
