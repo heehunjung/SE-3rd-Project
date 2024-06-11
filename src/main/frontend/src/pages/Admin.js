@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Nav, Container, Form, Button, Row, Col, Table, InputGroup } from 'react-bootstrap';
+import { Nav, Container, Button, Row, Col } from 'react-bootstrap';
 import Navbar from 'react-bootstrap/Navbar';
 import { useParams } from 'react-router-dom';
 import '../App.css';
@@ -100,25 +100,6 @@ const Admin = () => {
         setAmount(parseInt(e.target.value, 10));
     };
 
-    const handleUpdateBalance = (userId) => {
-        fetch(`http://localhost:8080/members/${userId}/balance?amount=${amount}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                setUsers(users.map(user => (user.id === userId ? data : user)));
-            })
-            .catch(error => console.error('Error updating balance:', error));
-    };
-
     const handleDeleteUser = (userId) => {
         fetch(`http://localhost:8080/members/${userId}`, {
             method: 'DELETE',
@@ -199,7 +180,7 @@ const Admin = () => {
                                             <div style={{flex: 1, textAlign: 'left'}}>{post.nickname}</div>
                                             <div style={{flex: 1, textAlign: 'left'}}>
                                                 <Button className="btn-icon" style={{marginLeft: 'auto'}}
-                                                        onClick={() => handleDeletePost(post.id)}>
+                                                        onClick={() => handleDeletePost(post.postId)}>
                                                     ❌
                                                 </Button>
                                             </div>
@@ -235,9 +216,12 @@ const Admin = () => {
                                             padding: '5px'
                                         }}>
                                             <div style={{flex: 1, textAlign: 'left'}}>{user.nickname}</div>
-                                            <div style={{flex: 1, textAlign: 'left'}}>{user.balance}</div>
+                                            <div style={{flex: 1, textAlign: 'left'}}>{user.balance.toLocaleString()}</div>
                                             <div style={{flex: 1, textAlign: 'left'}}>
-                                                <Button className="btn-icon" style={{marginLeft: 'auto'}} onClick={() => handleDeleteUser(user.id)}>❌</Button>
+                                                <Button className="btn-icon" style={{marginLeft: 'auto'}}
+                                                        onClick={() => handleDeleteUser(user.id)}>
+                                                    ❌
+                                                </Button>
                                             </div>
                                         </li>
                                     ))}
@@ -274,7 +258,7 @@ const Admin = () => {
                                         }}>
                                             <div style={{flex: 1, textAlign: 'left'}}>{stock.id}</div>
                                             <div style={{flex: 1, textAlign: 'left'}}>{stock.stockName}</div>
-                                            <div style={{flex: 1, textAlign: 'left'}}>{stock.currentPrice}</div>
+                                            <div style={{flex: 1, textAlign: 'left'}}>{stock.currentPrice.toLocaleString()}</div>
                                             <div style={{flex: 1, textAlign: 'left'}}>
                                                 <Button className="btn-icon" style={{marginLeft: 'auto'}} onClick={() => handleDeleteStock(stock.id)}>❌</Button>
                                             </div>

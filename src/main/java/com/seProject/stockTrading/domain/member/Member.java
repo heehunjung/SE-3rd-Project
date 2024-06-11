@@ -2,6 +2,7 @@ package com.seProject.stockTrading.domain.member;
 
 import com.seProject.stockTrading.domain.enums.MemberRole;
 import com.seProject.stockTrading.domain.post.Post;
+import com.seProject.stockTrading.domain.tradeRecord.TradeRecord;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

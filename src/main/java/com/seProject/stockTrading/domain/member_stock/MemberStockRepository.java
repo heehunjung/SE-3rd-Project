@@ -30,4 +30,5 @@ public interface MemberStockRepository extends JpaRepository<MemberStock, Long> 
             "GROUP BY ms.stock.id, ms.stock.stockName, ms.stock.stockSymbol " +
             "ORDER BY COUNT(ms) DESC")
     List<StockDTO> findTop5PreferredStocks(Pageable pageable);
+
 }

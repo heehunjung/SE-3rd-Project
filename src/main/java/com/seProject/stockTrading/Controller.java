@@ -23,6 +23,7 @@ import org.springframework.boot.autoconfigure.web.servlet.HttpEncodingAutoConfig
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Pageable;
@@ -505,23 +506,33 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 멤버의 데이터가 존재하지 않아요.");
         }
     }
-
-    // 멤버 삭제 API 추가
     @CrossOrigin
-    @DeleteMapping("/members/{id}")
-    public ResponseEntity<?> deleteMember(@PathVariable Long id) {
-        Optional<Member> memberOptional = memberRepository.findById(id);
-        if (memberOptional.isPresent()) {
-            memberRepository.deleteById(id);
-            return ResponseEntity.ok().body("멤버가 성공적으로 삭제되었습니다.");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 멤버의 데이터가 존재하지 않아요.");
+    @DeleteMapping("/members/{userId}")
+    public ResponseEntity<?> deleteMember(@PathVariable Long userId) {
+        try {
+            // 연관된 TradeRecord 삭제
+            List<TradeRecord> tradeRecords = tradeRecordRepository.findAllByMemberId(userId);
+            tradeRecordRepository.deleteAll(tradeRecords);
+
+            // 연관된 MemberStock 삭제
+            List<MemberStock> memberStocks = memberStockRepository.findAllByMemberId(userId);
+            memberStockRepository.deleteAll(memberStocks);
+
+            // 연관된 Post 삭제
+            List<Post> posts = postRepository.findAllByMemberId(userId);
+            postRepository.deleteAll(posts);
+
+            // 마지막으로 Member 삭제
+            memberRepository.deleteById(userId);
+
+            return ResponseEntity.ok("멤버가 성공적으로 삭제되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 시 문제가 발생했습니다: " + e.getMessage());
         }
     }
-
     // 모든 게시글 제목과 작성자를 반환하는 api
     @CrossOrigin
-    @GetMapping("title/username")
+    @GetMapping("/title/username")
     public ResponseEntity<?> getPostNameMember() {
         List<Post> postInfo = postRepository.findAllByOrderByCreatedAtDesc();
         if (postInfo.isEmpty()) {
@@ -540,7 +551,6 @@ public class Controller {
         }
         return ResponseEntity.ok(memberPostDTOList);
     }
-
     // admin에서 주식을 삭제하는 api
     @CrossOrigin
     @DeleteMapping("/stocks/{stockId}")
@@ -566,7 +576,6 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 시 문제가 발생했습니다: " + e.getMessage());
         }
     }
-
     // 관심 종목 선택이 가장 많이 된 5개 주식을 return
     @CrossOrigin
     @GetMapping("/memberStock/topPreferred")

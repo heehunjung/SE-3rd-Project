@@ -29,6 +29,6 @@ public class Post {
     private Timestamp createdAt;
     //게시글 작성자
     @ManyToOne
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(name = "member_id",nullable = false)
     private Member member;
 }
