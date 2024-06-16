@@ -34,4 +34,5 @@ EX) CREATE DATABASE picture_board;
 ```
 서버가 시작되며, 브라우저에서 http://localhost:3000으로 접속하여 애플리케이션을 확인할 수 있습니다.
 ```
-
+### 프로젝트 시연 영상
+https://www.youtube.com/watch?v=Mpzre3glBlQ&t=414s
