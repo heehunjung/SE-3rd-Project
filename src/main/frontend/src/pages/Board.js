@@ -163,7 +163,7 @@ const Board = () => {
                                                     <br/>
                                                     <Link
                                                         className="custom-link"
-                                                        to={`/ViewPost/${post.id}?memberId={id}`}
+                                                        to={`/ViewPost/${post.id}?memberId=${id}`}
                                                     >
                                                         {post.title}
                                                     </Link>
@@ -184,7 +184,7 @@ const Board = () => {
                                                     <br/>
                                                     <Link
                                                         className="custom-link"
-                                                        to={`/ViewPost/{post.id}?memberId={id}`}
+                                                        to={`/ViewPost/{post.id}?memberId=${id}`}
                                                     >
                                                         {post.title}
                                                     </Link>

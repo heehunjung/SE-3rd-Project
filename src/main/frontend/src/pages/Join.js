@@ -52,13 +52,14 @@ const Join = () => {
             })
             .then((res) => {
                 if (res.status === 201) {
-                    return res.json();
+                    return res.text(); // 여기서 JSON 파싱을 하지 않고 텍스트로 응답 받기
                 } else {
                     return res.text().then((text) => Promise.reject(text));
                 }
             })
             .then((data) => {
                 console.log(data);
+                alert(data); // 성공 메시지 표시
                 navigate('/');
             })
             .catch((error) => {

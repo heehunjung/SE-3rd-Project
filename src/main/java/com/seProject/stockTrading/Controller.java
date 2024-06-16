@@ -149,8 +149,8 @@ public class Controller {
         if (memberService.checkPerson(member.getName(), member.getNumber())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 가입한 사용자 입니다.");
         }
-        return new ResponseEntity<>(memberRepository.save(member), HttpStatus.CREATED);
-    }
+        Member savedMember = memberRepository.save(member);
+        return ResponseEntity.status(HttpStatus.CREATED).body("회원 가입 완료.");    }
 
     // 게시글 upload api
     @CrossOrigin
