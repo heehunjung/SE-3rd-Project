@@ -4,6 +4,7 @@ import com.seProject.stockTrading.domain.enums.MemberRole;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,31 +14,27 @@ import java.util.List;
 
 import static com.seProject.stockTrading.domain.enums.MemberRole.USER;
 
+@Entity
 @Getter
 @Setter
 @Builder(toBuilder = true)
+@NoArgsConstructor  // 기본 생성자 추가
 public class Member implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    //비밀번호
+
     private String password;
-    //아이디
     private String username;
-    //닉네임
     private String nickname;
-    //사용자 이름
     private String name;
-    //사용자 전화번호
     private Long number;
-    //사용자 잔고
     @Column(nullable = false)
     private Long balance = 0L;
-    //사용자 권한
     @Enumerated(EnumType.STRING)
     private MemberRole role = USER;
 
-
+    // UserDetails 메서드들 구현
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
@@ -53,29 +50,35 @@ public class Member implements UserDetails {
         return username;
     }
 
-    //계정 만료 여부 반환
     @Override
     public boolean isAccountNonExpired() {
-        return true; // true : 만료 x
+        return true;
     }
 
-    //계정 잠금 여부 반환
     @Override
     public boolean isAccountNonLocked() {
-        return true; // true : 잠금 x
+        return true;
     }
 
-    // 패스워드 만료 여부 반환
     @Override
     public boolean isCredentialsNonExpired() {
-        return true; // true : 만료 x
+        return true;
     }
 
-    // 계정 사용 가능 여부 반환
     @Override
     public boolean isEnabled() {
-        return true; // true : 사용 가능
+        return true;
+    }
+
+    // 생성자 (빌더를 사용할 때 필요)
+    public Member(Long id, String password, String username, String nickname, String name, Long number, Long balance, MemberRole role) {
+        this.id = id;
+        this.password = password;
+        this.username = username;
+        this.nickname = nickname;
+        this.name = name;
+        this.number = number;
+        this.balance = balance;
+        this.role = role;
     }
 }
-
-
