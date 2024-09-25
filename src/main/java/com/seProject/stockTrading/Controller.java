@@ -38,37 +38,15 @@ public class Controller {
     private final HttpEncodingAutoConfiguration httpEncodingAutoConfiguration;
     private final MemberStockRepository memberStockRepository;
     private final TradeRecordRepository tradeRecordRepository;
-    MemberRepository memberRepository;
-    MemberService memberService;
-    PostRepository postRepository;
-    PostService postService;
-    CommentRepository commentRepository;
-    StockRepository stockRepository;
-    StockPriceRepository stockPriceRepository;
+    private final MemberRepository memberRepository;
+    private final MemberService memberService;
+    private final PostRepository postRepository;
+    private final PostService postService;
+    private final CommentRepository commentRepository;
+    private final StockRepository stockRepository;
+    private final StockPriceRepository stockPriceRepository;
 
-    @Autowired
-    public Controller(
-            PostService postService,
-            PostRepository postRepository,
-            MemberRepository memberRepository,
-            MemberService memberService,
-            CommentRepository commentRepository,
-            StockRepository stockRepository,
-            StockPriceRepository stockPriceRepository,
-            HttpEncodingAutoConfiguration httpEncodingAutoConfiguration,
-            MemberStockRepository memberStockRepository,
-            TradeRecordRepository tradeRecordRepository) {
-        this.memberRepository = memberRepository;
-        this.memberService = memberService;
-        this.postRepository = postRepository;
-        this.postService = postService;
-        this.commentRepository = commentRepository;
-        this.stockRepository = stockRepository;
-        this.stockPriceRepository = stockPriceRepository;
-        this.httpEncodingAutoConfiguration = httpEncodingAutoConfiguration;
-        this.memberStockRepository = memberStockRepository;
-        this.tradeRecordRepository = tradeRecordRepository;
-    }
+
 
     // 모든 게시물을 list 형태로 가져오는 api
     @CrossOrigin

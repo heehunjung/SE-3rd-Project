@@ -15,8 +15,8 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI StockAPI() {
         Info info = new Info()
-                .title("UMC Server WorkBook API")
-                .description("UMC Server WorkBook API 명세서")
+                .title("주식 게시판 API 명세서")
+                .description("주식 게시판 Server API 명세서")
                 .version("1.0.0");
 
         String jwtSchemeName = "JWT TOKEN";
