@@ -23,6 +23,7 @@ import org.springframework.boot.autoconfigure.web.servlet.HttpEncodingAutoConfig
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,7 +46,7 @@ public class Controller {
     private final CommentRepository commentRepository;
     private final StockRepository stockRepository;
     private final StockPriceRepository stockPriceRepository;
-
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
     // 모든 게시물을 list 형태로 가져오는 api
@@ -127,8 +128,17 @@ public class Controller {
         if (memberService.checkPerson(member.getName(), member.getNumber())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 가입한 사용자 입니다.");
         }
-        Member savedMember = memberRepository.save(member);
-        return ResponseEntity.status(HttpStatus.CREATED).body("회원 가입 완료.");    }
+
+        String encodedPassword = bCryptPasswordEncoder.encode(member.getPassword());
+
+        Member newMember = member.toBuilder()
+                .password(encodedPassword)  // 비밀번호만 암호화된 값으로 설정
+                .build();
+
+        memberRepository.save(newMember);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("회원 가입 완료.");
+    }
 
     // 게시글 upload api
     @CrossOrigin

@@ -1,23 +1,21 @@
 package com.seProject.stockTrading.domain.member;
 
 import com.seProject.stockTrading.domain.enums.MemberRole;
-import com.seProject.stockTrading.domain.post.Post;
-import com.seProject.stockTrading.domain.tradeRecord.TradeRecord;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
 import static com.seProject.stockTrading.domain.enums.MemberRole.USER;
 
-@Entity
 @Getter
 @Setter
+@Builder(toBuilder = true)
 public class Member implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,6 +36,7 @@ public class Member implements UserDetails {
     //사용자 권한
     @Enumerated(EnumType.STRING)
     private MemberRole role = USER;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
