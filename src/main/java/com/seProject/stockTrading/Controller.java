@@ -107,7 +107,7 @@ public class Controller {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody MemberDTO imageDTO) {
         String username = imageDTO.getUsername();
-        Long password = imageDTO.getPassword();
+        String password = imageDTO.getPassword();
         Optional<Member> memberOptional = memberRepository.findByUsernameAndPassword(username, password);
         if (memberOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("존재하지 않는 회원정보입니다.");
