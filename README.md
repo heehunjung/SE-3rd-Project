@@ -36,3 +36,5 @@ EX) CREATE DATABASE picture_board;
 ```
 ### 프로젝트 시연 영상
 https://www.youtube.com/watch?v=Mpzre3glBlQ&t=414s
+...
+동작하는 똥입니다.
