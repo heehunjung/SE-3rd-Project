@@ -5,7 +5,7 @@ import com.seProject.stockTrading.domain.commets.CommentRepository;
 import com.seProject.stockTrading.domain.dto.*;
 import com.seProject.stockTrading.domain.member.Member;
 import com.seProject.stockTrading.domain.member.MemberRepository;
-import com.seProject.stockTrading.domain.member.MemberService;
+import com.seProject.stockTrading.domain.member.MemberRequestDTO;
 import com.seProject.stockTrading.domain.member_stock.MemberStock;
 import com.seProject.stockTrading.domain.member_stock.MemberStockRepository;
 import com.seProject.stockTrading.domain.post.Post;
@@ -36,18 +36,14 @@ import java.util.*;
 @RequiredArgsConstructor
 @RestController
 public class Controller {
-    private final HttpEncodingAutoConfiguration httpEncodingAutoConfiguration;
     private final MemberStockRepository memberStockRepository;
     private final TradeRecordRepository tradeRecordRepository;
     private final MemberRepository memberRepository;
-    private final MemberService memberService;
     private final PostRepository postRepository;
     private final PostService postService;
     private final CommentRepository commentRepository;
     private final StockRepository stockRepository;
     private final StockPriceRepository stockPriceRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
 
     // 모든 게시물을 list 형태로 가져오는 api
     @CrossOrigin
@@ -119,26 +115,26 @@ public class Controller {
     }
 
     // join api
-    @CrossOrigin
-    @PostMapping("/join")
-    public ResponseEntity<?> join(@RequestBody Member member) {
-        if (memberService.checkUsername(member.getUsername())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 있는 id 입니다.");
-        }
-        if (memberService.checkPerson(member.getName(), member.getNumber())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 가입한 사용자 입니다.");
-        }
-
-        String encodedPassword = bCryptPasswordEncoder.encode(member.getPassword());
-
-        Member newMember = member.toBuilder()
-                .password(encodedPassword)  // 비밀번호만 암호화된 값으로 설정
-                .build();
-
-        memberRepository.save(newMember);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body("회원 가입 완료.");
-    }
+//    @CrossOrigin
+//    @PostMapping("/join")
+//    public ResponseEntity<?> join(@RequestBody MemberRequestDTO.MemberForm memberForm) {
+//        if (memberService.checkUsername(memberForm.getUserName())) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 있는 id 입니다.");
+//        }
+//        if (memberService.checkPerson(memberForm.getName(), memberForm.getNumber())) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 가입한 사용자 입니다.");
+//        }
+//
+//        String encodedPassword = bCryptPasswordEncoder.encode(memberForm.getPassword());
+//
+//        Member newMember = member.toBuilder()
+//                .password(encodedPassword)  // 비밀번호만 암호화된 값으로 설정
+//                .build();
+//
+//        memberRepository.save(newMember);
+//
+//        return ResponseEntity.status(HttpStatus.CREATED).body("회원 가입 완료.");
+//    }
 
     // 게시글 upload api
     @CrossOrigin
@@ -310,7 +306,7 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잔액이 부족합니다.");
         }
 
-        member.get().setBalance(currentBalance - totalCost);
+//        member.get().setBalance(currentBalance - totalCost);
         if (memberStock.isEmpty()) {
             // 생성
             MemberStock memberStockObj = new MemberStock();
@@ -365,7 +361,7 @@ public class Controller {
 
         Long currentBalance = member.get().getBalance();
         Long totalCost = (long) (memberStockDTO.getStockQuantity() * stock.get().getCurrentPrice());
-        member.get().setBalance(currentBalance + totalCost);
+//        member.get().setBalance(currentBalance + totalCost);
         memberStock.get().setQuantity(currentQuantity - memberStockDTO.getStockQuantity());
         memberStock.get().setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
         memberStock.get().setStockName(stock.get().getStockName());
@@ -487,7 +483,7 @@ public class Controller {
         Optional<Member> memberOptional = memberRepository.findById(id);
         if (memberOptional.isPresent()) {
             Member member = memberOptional.get();
-            member.setBalance(member.getBalance() + amount);
+//            member.setBalances(member.getBalance() + amount);
             memberRepository.save(member);
             return ResponseEntity.ok().body("잔액이 성공적으로 수정되었습니다.");
         } else {

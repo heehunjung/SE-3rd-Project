@@ -1,7 +1,6 @@
 package com.seProject.stockTrading.domain.member;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,6 +15,15 @@ public class MemberService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
 
+    public Member CreateMember(MemberRequestDTO.MemberForm memberForm,String encodedPassword){
+        return Member.builder().
+                name(memberForm.getName()).
+                password(encodedPassword).
+                nickname(memberForm.getNickname()).
+                username(memberForm.getUserName()).
+                number(memberForm.getNumber()).
+                build();
+    }
 
     public boolean checkUsername(String username){
         Optional<Member> foundMember = memberRepository.findByUsername(username);

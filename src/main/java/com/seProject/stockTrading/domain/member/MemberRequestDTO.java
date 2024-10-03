@@ -11,7 +11,7 @@ public class MemberRequestDTO {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    private static class MemberForm{
+    public static class MemberForm{
         private String name;
 
         private String nickname;
