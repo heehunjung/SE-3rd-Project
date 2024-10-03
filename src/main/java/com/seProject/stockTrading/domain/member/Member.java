@@ -2,10 +2,7 @@ package com.seProject.stockTrading.domain.member;
 
 import com.seProject.stockTrading.domain.enums.MemberRole;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -17,20 +14,27 @@ import static com.seProject.stockTrading.domain.enums.MemberRole.USER;
 @Entity
 @Getter
 @Setter
-@Builder(toBuilder = true)
-@NoArgsConstructor  // 기본 생성자 추가
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // 해당 패키지와 상속 관계에서만 접근 가능한 기본 생성자
+@AllArgsConstructor
 public class Member implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String password;
     private String username;
+
+    private String password;
+
     private String nickname;
+
     private String name;
+
     private Long number;
+
     @Column(nullable = false)
     private Long balance = 0L;
+
     @Enumerated(EnumType.STRING)
     private MemberRole role = USER;
 
@@ -68,17 +72,5 @@ public class Member implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    // 생성자 (빌더를 사용할 때 필요)
-    public Member(Long id, String password, String username, String nickname, String name, Long number, Long balance, MemberRole role) {
-        this.id = id;
-        this.password = password;
-        this.username = username;
-        this.nickname = nickname;
-        this.name = name;
-        this.number = number;
-        this.balance = balance;
-        this.role = role;
     }
 }
