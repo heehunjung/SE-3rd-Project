@@ -1,5 +1,6 @@
 package com.seProject.stockTrading.domain.member;
 
+import com.seProject.stockTrading.BaseTimeEntity;
 import com.seProject.stockTrading.domain.enums.MemberRole;
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,11 +14,10 @@ import static com.seProject.stockTrading.domain.enums.MemberRole.USER;
 
 @Entity
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // 해당 패키지와 상속 관계에서만 접근 가능한 기본 생성자
 @AllArgsConstructor
-public class Member implements UserDetails {
+public class Member extends BaseTimeEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -32,7 +32,6 @@ public class MemberService implements UserDetailsService {
         return false; // 일치하는 회원이 없으면 false 반환
     }
 
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return memberRepository.findByUsername(username)
