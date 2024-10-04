@@ -1,7 +1,7 @@
 package com.seProject.stockTrading.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.seProject.stockTrading.domain.member.MemberServiceImpl;
+import com.seProject.stockTrading.domain.member.MemberService;
 import com.seProject.stockTrading.filter.JsonUsernamePasswordAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -25,7 +25,7 @@ public class SecurityConfig {
 
 
     private final ObjectMapper objectMapper;
-    private final MemberServiceImpl memberServiceImpl;
+    private final MemberService memberService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -57,7 +57,7 @@ public class SecurityConfig {
     public DaoAuthenticationProvider daoAuthenticationProvider() throws Exception {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
 
-        daoAuthenticationProvider.setUserDetailsService(memberServiceImpl);
+        daoAuthenticationProvider.setUserDetailsService(memberService);
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
 
         return daoAuthenticationProvider;
