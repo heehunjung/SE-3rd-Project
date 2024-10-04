@@ -1,8 +1,10 @@
-package com.seProject.stockTrading.config;
+package com.seProject.stockTrading.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seProject.stockTrading.domain.member.MemberService;
-import com.seProject.stockTrading.filter.JsonUsernamePasswordAuthenticationFilter;
+import com.seProject.stockTrading.global.config.login.filter.JsonUsernamePasswordAuthenticationFilter;
+import com.seProject.stockTrading.global.config.login.filter.LoginFailureHandler;
+import com.seProject.stockTrading.global.config.login.filter.handler.LoginSuccessJWTProvideHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -69,10 +71,24 @@ public class SecurityConfig {
         provider.setPasswordEncoder(passwordEncoder());//PasswordEncoder로는 PasswordEncoderFactories.createDelegatingPasswordEncoder() 사용
         return new ProviderManager(provider);
     }
+
+    @Bean
+    public LoginFailureHandler loginFailureHandler(){
+        return new LoginFailureHandler();
+    }
+
+    @Bean
+    public LoginSuccessJWTProvideHandler loginSuccessJWTProvideHandler(){
+        return new LoginSuccessJWTProvideHandler();
+    }
+
     @Bean
     public JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordLoginFilter() throws Exception {
         JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordLoginFilter = new JsonUsernamePasswordAuthenticationFilter(objectMapper);
         jsonUsernamePasswordLoginFilter.setAuthenticationManager(authenticationManager());
+        jsonUsernamePasswordLoginFilter.setAuthenticationSuccessHandler(loginSuccessJWTProvideHandler());
+        jsonUsernamePasswordLoginFilter.setAuthenticationFailureHandler(loginFailureHandler());
         return jsonUsernamePasswordLoginFilter;
+
     }
 }

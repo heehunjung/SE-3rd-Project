@@ -1,6 +1,7 @@
 package com.seProject.stockTrading.domain.member;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -45,8 +46,13 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return memberRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(username));
+        Member member = memberRepository.findByUsername(username).orElseThrow(() ->
+                new UsernameNotFoundException("Username " + username + " not found"));
+        return User.builder()
+                .username(member.getUsername())
+                .password(member.getPassword())
+                .roles("USER")
+                .build();
     }
 
 }

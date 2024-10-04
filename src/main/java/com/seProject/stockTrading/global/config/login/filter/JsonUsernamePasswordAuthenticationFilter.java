@@ -1,4 +1,4 @@
-package com.seProject.stockTrading.filter;
+package com.seProject.stockTrading.global.config.login.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;

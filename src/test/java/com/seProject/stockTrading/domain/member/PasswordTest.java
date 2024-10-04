@@ -1,7 +1,7 @@
 package com.seProject.stockTrading.domain.member;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.seProject.stockTrading.config.SecurityConfig;
+import com.seProject.stockTrading.global.config.SecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

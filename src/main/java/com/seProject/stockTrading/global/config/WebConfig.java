@@ -1,4 +1,4 @@
-package com.seProject.stockTrading.config;
+package com.seProject.stockTrading.global.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
