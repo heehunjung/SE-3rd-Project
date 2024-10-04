@@ -22,7 +22,7 @@ public class MemberServiceImpl implements MemberService {
                 name(memberForm.getName()).
                 password(encodedPassword).
                 nickname(memberForm.getNickname()).
-                username(memberForm.getUserName()).
+                username(memberForm.getUsername()).
                 number(memberForm.getNumber()).
                 build();
     }
@@ -51,7 +51,7 @@ public class MemberServiceImpl implements MemberService {
         return User.builder()
                 .username(member.getUsername())
                 .password(member.getPassword())
-                .roles("USER")
+//                .roles("USER")
                 .build();
     }
 

@@ -16,7 +16,7 @@ public class MemberRequestDTO {
 
         private String nickname;
 
-        private String userName;
+        private String username;
 
         private String password;
 

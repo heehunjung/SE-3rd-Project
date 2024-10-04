@@ -33,6 +33,7 @@ public class Member extends BaseTimeEntity implements UserDetails {
     private Long number;
 
     @Column(nullable = false)
+    @Builder.Default
     private Long balance = 0L;
 
     @Enumerated(EnumType.STRING)

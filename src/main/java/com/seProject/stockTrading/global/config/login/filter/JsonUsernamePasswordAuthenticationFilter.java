@@ -21,7 +21,7 @@ public class JsonUsernamePasswordAuthenticationFilter extends AbstractAuthentica
 
     private static final String DEFAULT_LOGIN_URL = "/login";
     private static final String HTTP_METHOD = "POST";
-    private static final String CONTENT_TYPE = "application/json";
+    private static final String CONTENT_TYPE = "application/json; charset=utf-8";
     private static final String USERNAME = "username";
     private static final String PASSWORD = "password";
 

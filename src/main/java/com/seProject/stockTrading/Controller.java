@@ -67,17 +67,17 @@ public class Controller {
         return ResponseEntity.ok(postInfo);
     }
 
-    // 멤버 id로 해당 멤버 객체 가져오는 api
-    @CrossOrigin
-    @GetMapping("/memberInfo/{id}")
-    public ResponseEntity<?> getMemberInfo(@PathVariable Long id) {
-        Optional<Member> memberInfoOptional = memberRepository.findById(id);
-        if (memberInfoOptional.isPresent()) {
-            return ResponseEntity.ok(memberInfoOptional.get());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 멤버의 데이터가 존재하지 않아요.");
-        }
-    }
+//    // 멤버 id로 해당 멤버 객체 가져오는 api
+//    @CrossOrigin
+//    @GetMapping("/memberInfo/{id}")
+//    public ResponseEntity<?> getMemberInfo(@PathVariable Long id) {
+//        Optional<Member> memberInfoOptional = memberRepository.findById(id);
+//        if (memberInfoOptional.isPresent()) {
+//            return ResponseEntity.ok(memberInfoOptional.get());
+//        } else {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 멤버의 데이터가 존재하지 않아요.");
+//        }
+//    }
 
     // stock_price 를 stock_id로 가져오는 api
     @CrossOrigin
@@ -98,21 +98,21 @@ public class Controller {
         List<Comment> comments = commentRepository.findAllByPostId(postId);
         return ResponseEntity.ok(comments);
     }
-
-    // login api
-    @CrossOrigin
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody MemberDTO imageDTO) {
-        String username = imageDTO.getUsername();
-        String password = imageDTO.getPassword();
-        Optional<Member> memberOptional = memberRepository.findByUsernameAndPassword(username, password);
-        if (memberOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("존재하지 않는 회원정보입니다.");
-        } else {
-            Member member = memberOptional.get();
-            return ResponseEntity.ok(Collections.singletonMap("id", member.getId()));
-        }
-    }
+//
+//    // login api
+//    @CrossOrigin
+//    @PostMapping("/login")
+//    public ResponseEntity<?> login(@RequestBody MemberDTO imageDTO) {
+//        String username = imageDTO.getUsername();
+//        String password = imageDTO.getPassword();
+//        Optional<Member> memberOptional = memberRepository.findByUsernameAndPassword(username, password);
+//        if (memberOptional.isEmpty()) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("존재하지 않는 회원정보입니다.");
+//        } else {
+//            Member member = memberOptional.get();
+//            return ResponseEntity.ok(Collections.singletonMap("id", member.getId()));
+//        }
+//    }
 
     // join api
 //    @CrossOrigin

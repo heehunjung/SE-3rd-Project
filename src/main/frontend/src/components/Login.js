@@ -1,9 +1,7 @@
-import React from 'react';
-import {Link} from "react-router-dom";
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button, Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useState } from 'react';
-import {useNavigate} from 'react-router-dom';
 
 function Login() {
     const navigate = useNavigate();
@@ -11,34 +9,48 @@ function Login() {
     const [loginData, setLoginData] = useState({
         username: '',
         password: ''
-    }); // 객체 생성
+    });
 
-    const handleChange =(e)=> {
+    const handleChange = (e) => {
         setLoginData({
             ...loginData,
             [e.target.name]: e.target.value
         });
-    } // 사용자의 입력에 따라 객체에 값을 넣는다.
+    };
 
-    const handleSubmit =(e)=> {
-        e.preventDefault(); // 폼이 제출될 때 자동적으로 새로 고침 되는 것을 방지
-        fetch('http://localhost:8080/login',{
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        fetch('http://localhost:8080/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json; charset=utf-8',
             },
-            body: JSON.stringify(loginData), // 실제 데이터를 포함 loginData를 JSON 문자열로 변환하여 서버에 보냄
+            body: JSON.stringify(loginData),
         })
-            .then(response=>response.json())
-            .then((data)=>{
-                if(data.id) {
-                    navigate(`/home/${data.id}`);
-                } else {
-                    alert("로그인에 실패하였습니다.");
+            .then(response => {
+                console.log("test")
+                console.log(response.headers);  // 응답 헤더를 로그로 출력
+
+                if (!response.ok) {
+                    throw new Error('로그인에 실패하였습니다.');
                 }
+                // 헤더에서 토큰을 가져옵니다.
+                const accessToken = response.headers.get('Authorization');
+                const refreshToken = response.headers.get('Authorization-Refresh');
+
+                if (!accessToken || !refreshToken) {
+                    throw new Error('토큰을 가져오지 못했습니다.');
+                }
+
+                // 토큰을 세션 또는 로컬 스토리지에 저장
+                sessionStorage.setItem('accessToken', accessToken);
+                sessionStorage.setItem('refreshToken', refreshToken);
+
+                // 홈 페이지로 이동
+                navigate('/home');
             })
-            .catch((error)=>{
-                console.error('Error',error);
+            .catch(error => {
+                console.error('Error:', error);
                 alert('로그인 중 오류가 발생했습니다.');
             });
     };
