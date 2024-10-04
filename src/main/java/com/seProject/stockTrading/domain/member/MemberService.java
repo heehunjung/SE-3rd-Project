@@ -1,31 +1,16 @@
 package com.seProject.stockTrading.domain.member;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import java.util.List;
-import java.util.Optional;
+public interface MemberService extends UserDetailsService {
+    Member CreateMember(MemberRequestDTO.MemberForm memberForm, String encodedPassword);
 
-@Service
-public class MemberService {
+    boolean checkUsername(String username);
 
-    MemberRepository memberRepository;
-    @Autowired
-    public MemberService(MemberRepository memberRepository){
-        this.memberRepository =memberRepository;
-    }
-    public boolean checkUsername(String username){
-        Optional<Member> foundMember = memberRepository.findByUsername(username);
-        return foundMember.isPresent();
-    }
-    public boolean checkPerson(String name, Long number) {
-        List<Member> foundMembers = memberRepository.findByName(name);
-        for (Member member : foundMembers) {
-            if (member.getNumber().equals(number)) {
-                return true; // 이름과 번호가 모두 일치하는 회원이 있으면 true 반환
-            }
-        }
-        return false; // 일치하는 회원이 없으면 false 반환
-    }
+    boolean checkPerson(String name, Long number);
 
+    @Override
+    UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
 }

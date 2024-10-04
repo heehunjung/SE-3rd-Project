@@ -24,7 +24,6 @@ const Join = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // 닉네임 중복 체크 먼저 수행
         fetch(`http://localhost:8080/nickname/${formData.nickname}`, {
             method: 'GET',
             headers: {
@@ -35,13 +34,12 @@ const Join = () => {
                 if (response.ok) {
                     return response.text().then((text) => Promise.reject("중복된 닉네임입니다."));
                 } else {
-                    return response.text(); // 사용 가능한 닉네임에 대한 메시지 반환
+                    return response.text();
                 }
             })
             .then((message) => {
-                console.log(message);
+                console.log("닉네임 검증 통과:", message);
 
-                // 닉네임 사용 가능 시 가입 요청
                 return fetch('http://localhost:8080/join', {
                     method: 'POST',
                     headers: {
@@ -52,19 +50,19 @@ const Join = () => {
             })
             .then((res) => {
                 if (res.status === 201) {
-                    return res.text(); // 여기서 JSON 파싱을 하지 않고 텍스트로 응답 받기
+                    return res.text();
                 } else {
                     return res.text().then((text) => Promise.reject(text));
                 }
             })
             .then((data) => {
-                console.log(data);
-                alert(data); // 성공 메시지 표시
-                navigate('/');
+                console.log("가입 성공:", data);
+                alert(data);
+                navigate('/login');
             })
             .catch((error) => {
-                console.error('Error:', error);
-                alert(error); // 오류 메시지 팝업 표시
+                console.error('오류 발생:', error);
+                alert(error);
             });
     };
 

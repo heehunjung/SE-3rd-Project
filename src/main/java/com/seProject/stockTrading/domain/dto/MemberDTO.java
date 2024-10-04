@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class MemberDTO {
     private String username;
-    private Long password;
+    private String password;
 }
