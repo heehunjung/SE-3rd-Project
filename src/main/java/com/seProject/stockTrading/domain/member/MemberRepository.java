@@ -8,10 +8,10 @@ import java.util.Optional;
 
 @Repository
 public interface MemberRepository extends JpaRepository<Member,Long>{
-    List<Member> findAllByOrderByIdDesc();
+    //default : public
     Optional<Member> findByUsername(String username);
-    public List<Member> findByName(String name);
+    List<Member> findByName(String name);
     Optional<Member> findByUsernameAndPassword(String username, String password);
     Optional<Member> findByNickname(String nickname);
-
+    boolean existsByNickname(String nickname);
 }
