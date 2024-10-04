@@ -38,6 +38,17 @@ public class Member extends BaseTimeEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private MemberRole role = USER;
 
+    @Column (length = 1000)
+    private String refreshToken;
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public void destroyRefreshToken() {
+        this.refreshToken = null;
+    }
+
     // UserDetails 메서드들 구현
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
